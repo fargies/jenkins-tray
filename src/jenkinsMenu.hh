@@ -41,8 +41,13 @@ public:
             const JenkinsProject &);
     ~JenkinsProjectAction();
 
-public slots:
+protected slots:
     void updateEvent(const JenkinsProject &);
+
+    void open();
+
+protected:
+    const JenkinsProject &m_proj;
 };
 
 class JenkinsMenu : public QMenu

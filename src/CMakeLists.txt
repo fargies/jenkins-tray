@@ -3,6 +3,8 @@ set(jenkinsTray_SOURCES
     jenkinsTray.cpp
     jenkinsRSSEngine.cpp
     jenkinsRSSParser.cpp
+    jenkinsBuildEngine.cpp
+    jenkinsBuildParser.cpp
     jenkinsDownloader.cpp
     jenkinsMenu.cpp
     jenkinsProject.cpp
@@ -11,6 +13,8 @@ set(jenkinsTray_HEADERS
     jenkinsTray.hh
     jenkinsRSSEngine.hh
     jenkinsRSSParser.hh
+    jenkinsBuildEngine.hh
+    jenkinsBuildParser.hh
     jenkinsMenu.hh
     jenkinsProject.hh
     jenkinsDownloader.hh)

@@ -63,7 +63,7 @@ JenkinsTray::~JenkinsTray()
 void JenkinsTray::update()
 {
     /** @todo: parameterize the url */
-    QNetworkReply *reply = m_downloader->get(QUrl("http://localhost:8080/rssLatest"));
+    QNetworkReply *reply = m_downloader->get(QUrl("http://172.16.11.90:8080/rssLatest"));
     m_engine->parse(reply);
 }
 

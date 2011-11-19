@@ -24,20 +24,30 @@
 **
 */
 
-#include <QDesktopService>
+#include <QDesktopServices>
 #include "jenkinsMenu.hh"
 #include "jenkinsProject.hh"
 
 JenkinsProjectAction::JenkinsProjectAction(
         QObject *parent,
         const JenkinsProject &project) :
-    QAction(parent)
+    QAction(parent),
+    m_proj(project)
 {
+    connect(&project, SIGNAL(updated(const JenkinsProject &)),
+            this, SLOT(updateEvent(const JenkinsProject &)));
+
+    connect(this, SIGNAL(triggered()), this, SLOT(open()));
     updateEvent(project);
 }
 
 JenkinsProjectAction::~JenkinsProjectAction()
 {
+}
+
+void JenkinsProjectAction::open()
+{
+    QDesktopServices::openUrl(m_proj.getUrl());
 }
 
 void JenkinsProjectAction::updateEvent(const JenkinsProject &proj)
@@ -48,7 +58,7 @@ void JenkinsProjectAction::updateEvent(const JenkinsProject &proj)
         case JenkinsProject::UNKNOWN:
             setIcon(QIcon(":/icons/gear"));
             break;
-        case JenkinsProject::STABLE:
+        case JenkinsProject::SUCCESS:
             setIcon(QIcon(":/icons/blue"));
             break;
         case JenkinsProject::FAILURE:

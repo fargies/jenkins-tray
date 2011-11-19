@@ -17,68 +17,43 @@
 **    misrepresented as being the original software.
 ** 3. This notice may not be removed or altered from any source distribution.
 **
-** jenkinsProject.hh
+** jenkinsBuildEngine.hh
 **
 **        Created on: Nov 19, 2011
 **   Original Author: fargie_s
 **
 */
 
-#ifndef __JENKINS_PROJECT_HH__
-#define __JENKINS_PROJECT_HH__
+#ifndef __JENKINS_PROJECT_ENGINE_HH__
+#define __JENKINS_PROJECT_ENGINE_HH__
 
 #include <QObject>
-#include <QString>
 #include <QUrl>
+#include "jenkinsProject.hh"
 
-class JenkinsProject : public QObject
+class QIODevice;
+class QXmlSimpleReader;
+class QXmlInputSource;
+
+class JenkinsBuildEngine : public QObject
 {
     Q_OBJECT;
 
 public:
-    enum State
-    {
-        UNKNOWN,
-        SUCCESS,
-        FAILURE,
-        UNSTABLE
-    };
+    JenkinsBuildEngine();
+    virtual ~JenkinsBuildEngine();
 
-    JenkinsProject(const QString &name, const QUrl &uri);
-    JenkinsProject(const QString &name, const QUrl &uri, int m_num);
-    ~JenkinsProject();
-
-    inline int getNum() const
-    {
-        return m_num;
-    }
-
-    inline const QString &getName() const
-    {
-        return m_name;
-    }
-
-    inline State getState() const
-    {
-        return m_state;
-    }
-
-    inline const QUrl &getUrl() const
-    {
-        return m_uri;
-    }
-
-public slots:
-    void update();
+    bool parse(QIODevice *input);
 
 signals:
-    void updated(const JenkinsProject &);
+    void projectEvent(JenkinsProject::State);
+
+public slots:
+    void parseContinue();
 
 protected:
-    QString m_name;
-    QUrl m_uri;
-    int m_num;
-    State m_state;
+    QXmlSimpleReader *m_reader;
+    QXmlInputSource  *m_source;
 };
 
 #endif

@@ -26,22 +26,20 @@
 
 #include <QDebug>
 #include <QRegExp>
-#include "jenkinsRSSParser.hh"
+#include "jenkinsBuildParser.hh"
 
-JenkinsRSSParser::JenkinsRSSParser() :
+JenkinsBuildParser::JenkinsBuildParser() :
     m_accu(false),
-    m_start(&JenkinsRSSParser::parserStart),
-    m_end(NULL),
-    m_titleEx("^(.+\\S)\\s*#(\\d+)\\s*\\((.+)\\)$"),
-    m_uriEx("^(.*/)\\d+/?$")
+    m_start(&JenkinsBuildParser::parserStart),
+    m_end(NULL)
 {
 }
 
-JenkinsRSSParser::~JenkinsRSSParser()
+JenkinsBuildParser::~JenkinsBuildParser()
 {
 }
 
-bool JenkinsRSSParser::startElement(
+bool JenkinsBuildParser::startElement(
         const QString &namespaceURI,
         const QString &localName,
         const QString &qName,
@@ -52,14 +50,14 @@ bool JenkinsRSSParser::startElement(
     return true;
 }
 
-bool JenkinsRSSParser::characters(const QString &st)
+bool JenkinsBuildParser::characters(const QString &st)
 {
     if (m_accu)
         m_data += st;
     return true;
 }
 
-bool JenkinsRSSParser::endElement(
+bool JenkinsBuildParser::endElement(
         const QString &namespaceURI,
         const QString &localName,
         const QString &qName)
@@ -69,71 +67,59 @@ bool JenkinsRSSParser::endElement(
     return true;
 }
 
-bool JenkinsRSSParser::parserStart(
+bool JenkinsBuildParser::parserStart(
         const QString &name,
         const QXmlAttributes &attrs)
 {
-    if (name == "entry")
+    if (name == "result")
     {
-        m_start = &JenkinsRSSParser::entryStart;
-        m_end = &JenkinsRSSParser::entryEnd;
-
-        m_name.clear();
-        m_uri.clear();
-        m_num = -1;
-    }
-    return true;
-}
-
-bool JenkinsRSSParser::entryStart(
-        const QString &name,
-        const QXmlAttributes &attrs)
-{
-    if (name == "title")
-    {
-        m_data.clear();
+        m_start = NULL;
+        m_end = &JenkinsBuildParser::resultEnd;
         m_accu = true;
     }
-    else if (name == "link")
+    else if (name != "freeStyleBuild" &&
+            name != "matrixBuild")
     {
-        if (m_uriEx.indexIn(attrs.value("href")) != -1)
-            m_uri = m_uriEx.cap(1);
-        else
-        {
-            /** @todo: set error ? */
-        }
+        m_start = NULL;
+        m_end = &JenkinsBuildParser::waitEnd;
+        m_opened = name;
     }
     return true;
 }
 
-bool JenkinsRSSParser::entryEnd(const QString &name)
+bool JenkinsBuildParser::resultEnd(const QString &name)
 {
-    if (name == "entry")
+    if (name == "result")
     {
-        if (!m_uri.isEmpty() && !m_name.isEmpty() && m_num != -1)
-            emit projectEvent(m_name, m_uri, m_num);
-        /** @todo: else send error */
-
-        m_start = &JenkinsRSSParser::parserStart;
-        m_end = NULL;
-    }
-    else if (name == "title")
-    {
-        if (m_titleEx.indexIn(m_data) != -1)
-        {
-            m_name = m_titleEx.cap(1);
-            m_num = m_titleEx.cap(2).toInt();
-        }
+        JenkinsProject::State state;
+        if (m_data == "SUCCESS")
+            state = JenkinsProject::SUCCESS;
+        else if (m_data == "UNSTABLE")
+            state = JenkinsProject::UNSTABLE;
+        else if (m_data == "FAILURE")
+            state = JenkinsProject::FAILURE;
         else
-        {
-            /** @todo: set error ? */
-        }
+            state = JenkinsProject::UNKNOWN;
+
+        emit projectEvent(state);
+
+        m_start = &JenkinsBuildParser::parserStart;
+        m_end = NULL;
         m_accu = false;
     }
     return true;
 }
 
-bool JenkinsRSSParser::fatalError(const QXmlParseException &exception)
+bool JenkinsBuildParser::waitEnd(const QString &name)
+{
+    if (name == m_opened)
+    {
+        m_start = &JenkinsBuildParser::parserStart;
+        m_end = NULL;
+    }
+}
+
+bool JenkinsBuildParser::fatalError(const QXmlParseException &exception)
 {
     return false;
 }

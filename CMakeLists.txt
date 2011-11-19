@@ -1,7 +1,7 @@
 
 cmake_minimum_required(VERSION 2.8)
 
-project(jenkins-tray CXX)
+project(jenkins-tray)
 
 find_package(Qt4 REQUIRED)
 set(QT_USE_QTNETWORK TRUE)
