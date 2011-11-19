@@ -1,0 +1,8 @@
+<!DOCTYPE RCC><RCC version="1.0">
+<qresource>
+    <file alias="icons/red">icons/red.png</file>
+    <file alias="icons/yellow">icons/yellow.png</file>
+    <file alias="icons/blue">icons/blue.png</file>
+    <file alias="icons/gear">icons/gear2.png</file>
+</qresource>
+</RCC>

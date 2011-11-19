@@ -17,48 +17,42 @@
 **    misrepresented as being the original software.
 ** 3. This notice may not be removed or altered from any source distribution.
 **
-** jenkins_tray.hh
+** jenkinsEngine.hh
 **
 **        Created on: Nov 17, 2011
 **   Original Author: fargie_s
 **
 */
 
-#ifndef __JENKINS_TRAY_HH__
-#define __JENKINS_TRAY_HH__
+#ifndef __JENKINS_ENGINE_HH__
+#define __JENKINS_ENGINE_HH__
 
-#include <QSystemTrayIcon>
-#include <QTimer>
+#include <QObject>
 #include <QUrl>
-#include <QMap>
 
-class JenkinsDownloader;
-class JenkinsRSSEngine;
-class JenkinsMenu;
-class JenkinsProject;
-class QNetworkReply;
+class QIODevice;
+class QXmlSimpleReader;
+class QXmlInputSource;
 
-class JenkinsTray : public QSystemTrayIcon
+class JenkinsRSSEngine : public QObject
 {
-    Q_OBJECT
+    Q_OBJECT;
 
 public:
-    JenkinsTray();
-    virtual ~JenkinsTray();
+    JenkinsRSSEngine();
+    virtual ~JenkinsRSSEngine();
 
-protected slots:
-    void update();
-    void updateFinished(QNetworkReply *);
+    bool parse(QIODevice *input);
 
-    void updateEvent(const QString &name, const QUrl &uri, int buildNum);
+signals:
+    void projectEvent(const QString &, const QUrl &, int);
 
-    /** @todo: implement removeEvent */
+public slots:
+    void parseContinue();
+
 protected:
-    JenkinsDownloader *m_downloader;
-    JenkinsRSSEngine *m_engine;
-    JenkinsMenu *m_menu;
-    QTimer m_timer;
-    QMap<QString, JenkinsProject *> m_projects;
+    QXmlSimpleReader *m_reader;
+    QXmlInputSource  *m_source;
 };
 
 #endif

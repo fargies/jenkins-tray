@@ -30,24 +30,24 @@
 #include <QObject>
 #include <QString>
 #include <QRegExp>
+#include <QUrl>
 #include <QXmlDefaultHandler>
-#include "jenkinsStatus.hh"
 
-class JenkinsParser :
+class JenkinsRSSParser :
     public QObject,
     public QXmlDefaultHandler
 {
     Q_OBJECT;
 
 public:
-    typedef bool (JenkinsParser::*startHandler)(
+    typedef bool (JenkinsRSSParser::*startHandler)(
             const QString &name,
             const QXmlAttributes &attrs);
-    typedef bool (JenkinsParser::*endHandler)(
+    typedef bool (JenkinsRSSParser::*endHandler)(
             const QString &name);
 
-    JenkinsParser();
-    virtual ~JenkinsParser();
+    JenkinsRSSParser();
+    virtual ~JenkinsRSSParser();
 
     virtual bool startElement(
             const QString &namespaceURI,
@@ -74,7 +74,7 @@ public:
             const QString &name);
 
 signals:
-    void buildEvent(const JenkinsStatus &);
+    void projectEvent(const QString &, const QUrl &, int);
 
 protected:
     bool m_accu;
@@ -82,7 +82,11 @@ protected:
     startHandler m_start;
     endHandler m_end;
     QRegExp m_titleEx;
-    JenkinsStatus m_event;
+    QRegExp m_uriEx;
+
+    QUrl m_uri;
+    QString m_name;
+    int m_num;
 };
 
 #endif

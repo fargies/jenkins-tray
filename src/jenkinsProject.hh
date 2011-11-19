@@ -17,67 +17,63 @@
 **    misrepresented as being the original software.
 ** 3. This notice may not be removed or altered from any source distribution.
 **
-** jenkinsStatus.hh
+** jenkinsProject.hh
 **
-**        Created on: Nov 18, 2011
+**        Created on: Nov 19, 2011
 **   Original Author: fargie_s
 **
 */
 
-#ifndef __JENKINS_STATUS_HH__
-#define __JENKINS_STATUS_HH__
+#ifndef __JENKINS_PROJECT_HH__
+#define __JENKINS_PROJECT_HH__
 
+#include <QObject>
 #include <QString>
+#include <QUrl>
 
-class JenkinsStatus
+class JenkinsProject : public QObject
 {
+    Q_OBJECT;
+
 public:
     enum State
     {
-        SUCCESS;
-        FAILURE;
-        UNSTABLE;
+        UNKNOWN,
+        STABLE,
+        FAILURE,
+        UNSTABLE
     };
 
-    JenkinsStatus();
-    ~JenkinsStatus();
-
-    inline const QString &getName() const
-    {
-        return m_name;
-    }
-
-    inline void setName(const QString &name)
-    {
-        m_name = name;
-    }
-
-    inline const QString &getID() const
-    {
-        return m_id;
-    }
-
-    inline void setID(const QString &id)
-    {
-        m_id = id;
-    }
+    JenkinsProject(const QString &name, const QUrl &uri);
+    JenkinsProject(const QString &name, const QUrl &uri, int m_num);
+    ~JenkinsProject();
 
     inline int getNum() const
     {
         return m_num;
     }
 
-    inline void setNum(int num)
+    inline const QString &getName() const
     {
-        m_num = num;
+        return m_name;
     }
 
-    void clear();
+    inline State getState() const
+    {
+        return m_state;
+    }
+
+public slots:
+    void update();
+
+signals:
+    void updated(JenkinsProject *);
 
 protected:
-    QString m_id;
     QString m_name;
-    int     m_num;
+    QUrl m_uri;
+    int m_num;
+    State m_state;
 };
 
 #endif

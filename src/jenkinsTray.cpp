@@ -24,27 +24,31 @@
 **
 */
 
-#include <QDebug>
 #include "jenkinsTray.hh"
-#include "jenkinsEngine.hh"
+#include "jenkinsRSSEngine.hh"
 #include "jenkinsDownloader.hh"
+#include "jenkinsProject.hh"
+#include "jenkinsMenu.hh"
 
 JenkinsTray::JenkinsTray() :
     QSystemTrayIcon(QIcon(":/icons/gear")),
     m_downloader(new JenkinsDownloader()),
-    m_engine(new JenkinsEngine()),
+    m_engine(new JenkinsRSSEngine()),
+    m_menu(new JenkinsMenu(NULL)),
     m_timer()
 {
     connect(m_downloader, SIGNAL(finished(QNetworkReply *)),
-            this, SLOT(requestFinished(QNetworkReply *)));
+            this, SLOT(updateFinished(QNetworkReply *)));
 
     connect(&m_timer, SIGNAL(timeout()),
             this, SLOT(update()));
 
-    connect(m_engine, SIGNAL(buildEvent(const JenkinsStatus &)),
-            this, SLOT(buildEvent(const JenkinsStatus &)));
+    connect(m_engine, SIGNAL(projectEvent(const QString &, const QUrl &, int)),
+            this, SLOT(updateEvent(const QString &, const QUrl &, int)));
 
-            m_timer.setInterval(1000);
+    setContextMenu(m_menu);
+
+    m_timer.setInterval(1000);
     m_timer.setSingleShot(true);
     m_timer.start();
 }
@@ -53,6 +57,7 @@ JenkinsTray::~JenkinsTray()
 {
     delete m_downloader;
     delete m_engine;
+    delete m_menu;
 }
 
 void JenkinsTray::update()
@@ -62,15 +67,26 @@ void JenkinsTray::update()
     m_engine->parse(reply);
 }
 
-void JenkinsTray::requestFinished(QNetworkReply *reply)
+void JenkinsTray::updateFinished(QNetworkReply *reply)
 {
     m_engine->parseContinue();
     reply->deleteLater();
 }
 
-void JenkinsTray::buildEvent(const JenkinsStatus &status)
+void JenkinsTray::updateEvent(const QString &name, const QUrl &uri, int buildNum)
 {
-    qDebug() << "status updated " << status.getName();
-    showMessage("", status.getID());
+    QMap<QString, JenkinsProject *>::iterator it = m_projects.find(name);
+
+    if (it == m_projects.end())
+    {
+        it = m_projects.insert(name, new JenkinsProject(name, uri, buildNum));
+        it.value()->update();
+        m_menu->addProject(*(it.value()));
+    }
+    else
+    {
+        if (it.value()->getNum() != buildNum)
+            it.value()->update();
+    }
 }
 

@@ -17,28 +17,30 @@
 **    misrepresented as being the original software.
 ** 3. This notice may not be removed or altered from any source distribution.
 **
-** jenkinsStatus.cpp
+** jenkinsProject.cpp
 **
-**        Created on: Nov 18, 2011
+**        Created on: Nov 19, 2011
 **   Original Author: fargie_s
 **
 */
 
-#include "jenkinsStatus.hh"
+#include "jenkinsProject.hh"
 
-JenkinsStatus::JenkinsStatus() :
-    m_name(), m_id(), m_num(-1)
+JenkinsProject::JenkinsProject(const QString &name, const QUrl &uri) :
+    m_name(name), m_uri(uri), m_num(-1)
 {
 }
 
-JenkinsStatus::~JenkinsStatus()
+JenkinsProject::JenkinsProject(const QString &name, const QUrl &uri, int num) :
+    m_name(name), m_uri(uri), m_num(num)
 {
 }
 
-void JenkinsStatus::clear()
+JenkinsProject::~JenkinsProject()
 {
-    m_name.clear();
-    m_id.clear();
-    m_num = -1;
+}
+
+void JenkinsProject::update()
+{
 }
 

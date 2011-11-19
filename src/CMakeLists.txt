@@ -1,16 +1,18 @@
 
 set(jenkinsTray_SOURCES
     jenkinsTray.cpp
-    jenkinsEngine.cpp
-    jenkinsParser.cpp
-    jenkinsStatus.cpp
+    jenkinsRSSEngine.cpp
+    jenkinsRSSParser.cpp
     jenkinsDownloader.cpp
+    jenkinsMenu.cpp
+    jenkinsProject.cpp
     main.cpp)
 set(jenkinsTray_HEADERS
     jenkinsTray.hh
-    jenkinsEngine.hh
-    jenkinsParser.hh
-    jenkinsStatus.hh
+    jenkinsRSSEngine.hh
+    jenkinsRSSParser.hh
+    jenkinsMenu.hh
+    jenkinsProject.hh
     jenkinsDownloader.hh)
 set(jenkinsTray_RESOURCES jenkinsTray.qrc)
 

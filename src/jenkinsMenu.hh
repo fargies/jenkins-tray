@@ -17,42 +17,42 @@
 **    misrepresented as being the original software.
 ** 3. This notice may not be removed or altered from any source distribution.
 **
-** jenkinsEngine.hh
+** jenkinsMenu.hh
 **
-**        Created on: Nov 17, 2011
+**        Created on: Nov 19, 2011
 **   Original Author: fargie_s
 **
 */
 
-#ifndef __JENKINS_ENGINE_HH__
-#define __JENKINS_ENGINE_HH__
+#ifndef __JENKINS_MENU_HH__
+#define __JENKINS_MENU_HH__
 
-#include <QObject>
-#include "jenkinsStatus.hh"
+#include <QMenu>
+#include <QAction>
 
-class QIODevice;
-class QXmlSimpleReader;
-class QXmlInputSource;
+class JenkinsProject;
 
-class JenkinsEngine : public QObject
+class JenkinsProjectAction : public QAction
 {
     Q_OBJECT;
-
 public:
-    JenkinsEngine();
-    virtual ~JenkinsEngine();
-
-    bool parse(QIODevice *input);
-
-signals:
-    void buildEvent(const JenkinsStatus &);
+    JenkinsProjectAction(
+            QObject *parent,
+            const JenkinsProject &);
+    ~JenkinsProjectAction();
 
 public slots:
-    void parseContinue();
+    void updateEvent(const JenkinsProject &);
+};
 
-protected:
-    QXmlSimpleReader *m_reader;
-    QXmlInputSource  *m_source;
+class JenkinsMenu : public QMenu
+{
+    Q_OBJECT;
+public:
+    JenkinsMenu(QWidget *parent);
+    virtual ~JenkinsMenu();
+
+    void addProject(const JenkinsProject &);
 };
 
 #endif

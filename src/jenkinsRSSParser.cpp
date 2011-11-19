@@ -26,21 +26,22 @@
 
 #include <QDebug>
 #include <QRegExp>
-#include "jenkinsParser.hh"
+#include "jenkinsRSSParser.hh"
 
-JenkinsParser::JenkinsParser() :
+JenkinsRSSParser::JenkinsRSSParser() :
     m_accu(false),
-    m_start(&JenkinsParser::parserStart),
+    m_start(&JenkinsRSSParser::parserStart),
     m_end(NULL),
-    m_titleEx("^(.+\\S)\\s*#(\\d+)\\s*\\((.+)\\)$")
+    m_titleEx("^(.+\\S)\\s*#(\\d+)\\s*\\((.+)\\)$"),
+    m_uriEx("^(.*/)\\d+/?$")
 {
 }
 
-JenkinsParser::~JenkinsParser()
+JenkinsRSSParser::~JenkinsRSSParser()
 {
 }
 
-bool JenkinsParser::startElement(
+bool JenkinsRSSParser::startElement(
         const QString &namespaceURI,
         const QString &localName,
         const QString &qName,
@@ -51,14 +52,14 @@ bool JenkinsParser::startElement(
     return true;
 }
 
-bool JenkinsParser::characters(const QString &st)
+bool JenkinsRSSParser::characters(const QString &st)
 {
     if (m_accu)
         m_data += st;
     return true;
 }
 
-bool JenkinsParser::endElement(
+bool JenkinsRSSParser::endElement(
         const QString &namespaceURI,
         const QString &localName,
         const QString &qName)
@@ -68,62 +69,70 @@ bool JenkinsParser::endElement(
     return true;
 }
 
-bool JenkinsParser::parserStart(
+bool JenkinsRSSParser::parserStart(
         const QString &name,
         const QXmlAttributes &attrs)
 {
     if (name == "entry")
     {
-        m_start = &JenkinsParser::entryStart;
-        m_end = &JenkinsParser::entryEnd;
-        m_event.clear();
+        m_start = &JenkinsRSSParser::entryStart;
+        m_end = &JenkinsRSSParser::entryEnd;
+
+        m_name.clear();
+        m_uri.clear();
+        m_num = -1;
     }
     return true;
 }
 
-bool JenkinsParser::entryStart(
+bool JenkinsRSSParser::entryStart(
         const QString &name,
         const QXmlAttributes &attrs)
 {
-    if (name == "title" ||
-            name == "id")
+    if (name == "title")
     {
         m_data.clear();
         m_accu = true;
     }
     else if (name == "link")
     {
-        /** @todo: get the link */
+        if (m_uriEx.indexIn(attrs.value("href")) != -1)
+            m_uri = m_uriEx.cap(1);
+        else
+        {
+            /** @todo: set error ? */
+        }
     }
     return true;
 }
 
-bool JenkinsParser::entryEnd(const QString &name)
+bool JenkinsRSSParser::entryEnd(const QString &name)
 {
     if (name == "entry")
     {
-        emit buildEvent(m_event);
-        m_start = &JenkinsParser::parserStart;
+        if (!m_uri.isEmpty() && !m_name.isEmpty() && m_num != -1)
+            emit projectEvent(m_name, m_uri, m_num);
+        /** @todo: else send error */
+
+        m_start = &JenkinsRSSParser::parserStart;
         m_end = NULL;
     }
     else if (name == "title")
     {
         if (m_titleEx.indexIn(m_data) != -1)
         {
-            m_event.setName(m_titleEx.cap(1));
-            m_event.setNum(m_titleEx.cap(2).toInt());
+            m_name = m_titleEx.cap(1);
+            m_num = m_titleEx.cap(2).toInt();
         }
         else
         {
             /** @todo: set error ? */
         }
     }
-    else if (name == "id")
-        m_event.setID(m_data);
     return true;
 }
 
-bool JenkinsParser::fatalError(const QXmlParseException &exception)
+bool JenkinsRSSParser::fatalError(const QXmlParseException &exception)
 {
     return false;
 }

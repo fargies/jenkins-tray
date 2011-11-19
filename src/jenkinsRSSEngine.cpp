@@ -27,22 +27,21 @@
 #include <QXmlSimpleReader>
 #include <QXmlSimpleReader>
 #include <QXmlDefaultHandler>
-#include "jenkinsEngine.hh"
-#include "jenkinsParser.hh"
-#include <QDebug>
+#include "jenkinsRSSEngine.hh"
+#include "jenkinsRSSParser.hh"
 
-JenkinsEngine::JenkinsEngine() :
+JenkinsRSSEngine::JenkinsRSSEngine() :
     m_reader(new QXmlSimpleReader()),
     m_source(NULL)
 {
-    JenkinsParser *parser = new JenkinsParser();
+    JenkinsRSSParser *parser = new JenkinsRSSParser();
     m_reader->setContentHandler(parser);
     m_reader->setErrorHandler(parser);
-    connect(parser, SIGNAL(buildEvent(const JenkinsStatus &)),
-            this, SIGNAL(buildEvent(const JenkinsStatus &)));
+    connect(parser, SIGNAL(projectEvent(const QString &, const QUrl &, int)),
+            this, SIGNAL(projectEvent(const QString &, const QUrl &, int)));
 }
 
-JenkinsEngine::~JenkinsEngine()
+JenkinsRSSEngine::~JenkinsRSSEngine()
 {
     delete m_reader->contentHandler();
     delete m_reader;
@@ -50,7 +49,7 @@ JenkinsEngine::~JenkinsEngine()
         delete m_source;
 }
 
-bool JenkinsEngine::parse(QIODevice *input)
+bool JenkinsRSSEngine::parse(QIODevice *input)
 {
     bool ret;
 
@@ -67,7 +66,7 @@ bool JenkinsEngine::parse(QIODevice *input)
     return ret;
 }
 
-void JenkinsEngine::parseContinue()
+void JenkinsRSSEngine::parseContinue()
 {
     m_reader->parseContinue();
 }
