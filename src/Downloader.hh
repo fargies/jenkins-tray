@@ -17,49 +17,34 @@
 **    misrepresented as being the original software.
 ** 3. This notice may not be removed or altered from any source distribution.
 **
-** jenkins_tray.hh
+** jenkinsDownloader.hh
 **
 **        Created on: Nov 17, 2011
 **   Original Author: fargie_s
 **
 */
 
-#ifndef __JENKINS_TRAY_HH__
-#define __JENKINS_TRAY_HH__
+#ifndef __JENKINS_DOWNLOADER_HH__
+#define __JENKINS_DOWNLOADER_HH__
 
-#include <QSystemTrayIcon>
-#include <QTimer>
-#include <QUrl>
-#include <QMap>
+#include <QObject>
+#include <QNetworkAccessManager>
+#include <QNetworkReply>
 
-class JenkinsDownloader;
-class JenkinsRSSEngine;
-class JenkinsMenu;
-class JenkinsProject;
-class QNetworkReply;
+namespace Jenkins {
 
-class JenkinsTray : public QSystemTrayIcon
+class Downloader : public QNetworkAccessManager
 {
-    Q_OBJECT
+    Q_OBJECT;
 
 public:
-    JenkinsTray();
-    virtual ~JenkinsTray();
+    Downloader();
+    virtual ~Downloader();
 
-protected slots:
-    void update();
-    void updateFinished(QNetworkReply *);
-
-    void updateEvent(const QString &name, const QUrl &uri, int buildNum);
-
-    /** @todo: implement removeEvent */
-protected:
-    JenkinsDownloader *m_downloader;
-    JenkinsRSSEngine *m_engine;
-    JenkinsMenu *m_menu;
-    QTimer m_timer;
-    QMap<QString, JenkinsProject *> m_projects;
+    QNetworkReply *get(const QUrl &);
 };
+
+}
 
 #endif
 

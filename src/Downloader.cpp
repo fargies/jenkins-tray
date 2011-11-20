@@ -17,48 +17,34 @@
 **    misrepresented as being the original software.
 ** 3. This notice may not be removed or altered from any source distribution.
 **
-** jenkinsMenu.hh
+** jenkinsDownloader.cpp
 **
-**        Created on: Nov 19, 2011
+**        Created on: Nov 17, 2011
 **   Original Author: fargie_s
 **
 */
 
-#ifndef __JENKINS_MENU_HH__
-#define __JENKINS_MENU_HH__
+#include <QNetworkRequest>
+#include "Downloader.hh"
 
-#include <QMenu>
-#include <QAction>
+namespace Jenkins {
 
-class JenkinsProject;
-
-class JenkinsProjectAction : public QAction
+Downloader::Downloader()
 {
-    Q_OBJECT;
-public:
-    JenkinsProjectAction(
-            QObject *parent,
-            const JenkinsProject &);
-    ~JenkinsProjectAction();
+}
 
-protected slots:
-    void updateEvent(const JenkinsProject &);
-
-    void open();
-
-protected:
-    const JenkinsProject &m_proj;
-};
-
-class JenkinsMenu : public QMenu
+QNetworkReply *Downloader::get(const QUrl &url)
 {
-    Q_OBJECT;
-public:
-    JenkinsMenu(QWidget *parent);
-    virtual ~JenkinsMenu();
+    QNetworkRequest request;
+    request.setUrl(url);
+    request.setRawHeader("User-Agent", "JenkinsTray 1.0");
 
-    void addProject(const JenkinsProject &);
-};
+    return QNetworkAccessManager::get(request);
+}
 
-#endif
+Downloader::~Downloader()
+{
+}
+
+}
 

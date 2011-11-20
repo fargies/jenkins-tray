@@ -17,30 +17,53 @@
 **    misrepresented as being the original software.
 ** 3. This notice may not be removed or altered from any source distribution.
 **
-** jenkinsDownloader.cpp
+** jenkins_tray.hh
 **
 **        Created on: Nov 17, 2011
 **   Original Author: fargie_s
 **
 */
 
-#include <QNetworkRequest>
-#include "jenkinsDownloader.hh"
+#ifndef __JENKINS_TRAY_HH__
+#define __JENKINS_TRAY_HH__
 
-JenkinsDownloader::JenkinsDownloader()
+#include <QSystemTrayIcon>
+#include <QTimer>
+#include <QUrl>
+#include <QMap>
+
+class QNetworkReply;
+
+namespace Jenkins {
+
+class Downloader;
+class RSSParser;
+class Menu;
+class Project;
+
+
+class Tray : public QSystemTrayIcon
 {
+    Q_OBJECT
+
+public:
+    Tray();
+    virtual ~Tray();
+
+protected slots:
+    void update();
+
+    void updateEvent(const QString &name, const QUrl &uri, int buildNum);
+
+protected:
+    Downloader *m_downloader;
+    RSSParser *m_parser;
+    Menu *m_menu;
+    QTimer m_timer;
+    QMap<QString, Project *> m_projects;
+};
+
 }
 
-QNetworkReply *JenkinsDownloader::get(const QUrl &url)
-{
-    QNetworkRequest request;
-    request.setUrl(url);
-    request.setRawHeader("User-Agent", "JenkinsTray 1.0");
-
-    return QNetworkAccessManager::get(request);
-}
-
-JenkinsDownloader::~JenkinsDownloader()
-{
-}
+#endif
 

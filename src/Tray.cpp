@@ -24,26 +24,25 @@
 **
 */
 
-#include "jenkinsTray.hh"
-#include "jenkinsRSSEngine.hh"
-#include "jenkinsDownloader.hh"
-#include "jenkinsProject.hh"
-#include "jenkinsMenu.hh"
+#include "Tray.hh"
+#include "RSSParser.hh"
+#include "Downloader.hh"
+#include "Project.hh"
+#include "Menu.hh"
 
-JenkinsTray::JenkinsTray() :
+namespace Jenkins {
+
+Tray::Tray() :
     QSystemTrayIcon(QIcon(":/icons/gear")),
-    m_downloader(new JenkinsDownloader()),
-    m_engine(new JenkinsRSSEngine()),
-    m_menu(new JenkinsMenu(NULL)),
+    m_downloader(new Downloader()),
+    m_parser(new RSSParser()),
+    m_menu(new Menu(NULL)),
     m_timer()
 {
-    connect(m_downloader, SIGNAL(finished(QNetworkReply *)),
-            this, SLOT(updateFinished(QNetworkReply *)));
-
     connect(&m_timer, SIGNAL(timeout()),
             this, SLOT(update()));
 
-    connect(m_engine, SIGNAL(projectEvent(const QString &, const QUrl &, int)),
+    connect(m_parser, SIGNAL(projectEvent(const QString &, const QUrl &, int)),
             this, SLOT(updateEvent(const QString &, const QUrl &, int)));
 
     setContextMenu(m_menu);
@@ -53,33 +52,27 @@ JenkinsTray::JenkinsTray() :
     m_timer.start();
 }
 
-JenkinsTray::~JenkinsTray()
+Tray::~Tray()
 {
     delete m_downloader;
-    delete m_engine;
+    delete m_parser;
     delete m_menu;
 }
 
-void JenkinsTray::update()
+void Tray::update()
 {
     /** @todo: parameterize the url */
-    QNetworkReply *reply = m_downloader->get(QUrl("http://172.16.11.90:8080/rssLatest"));
-    m_engine->parse(reply);
+    QNetworkReply *reply = m_downloader->get(QUrl("http://localhost:8080/rssLatest"));
+    m_parser->parse(reply);
 }
 
-void JenkinsTray::updateFinished(QNetworkReply *reply)
+void Tray::updateEvent(const QString &name, const QUrl &uri, int buildNum)
 {
-    m_engine->parseContinue();
-    reply->deleteLater();
-}
-
-void JenkinsTray::updateEvent(const QString &name, const QUrl &uri, int buildNum)
-{
-    QMap<QString, JenkinsProject *>::iterator it = m_projects.find(name);
+    QMap<QString, Project *>::iterator it = m_projects.find(name);
 
     if (it == m_projects.end())
     {
-        it = m_projects.insert(name, new JenkinsProject(name, uri, buildNum));
+        it = m_projects.insert(name, new Project(name, uri, buildNum));
         it.value()->update();
         m_menu->addProject(*(it.value()));
     }
@@ -88,5 +81,7 @@ void JenkinsTray::updateEvent(const QString &name, const QUrl &uri, int buildNum
         if (it.value()->getNum() != buildNum)
             it.value()->update();
     }
+}
+
 }
 

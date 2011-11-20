@@ -17,69 +17,77 @@
 **    misrepresented as being the original software.
 ** 3. This notice may not be removed or altered from any source distribution.
 **
-** jenkinsProject.hh
+** RSSParser.hh
 **
-**        Created on: Nov 19, 2011
+**        Created on: Nov 18, 2011
 **   Original Author: fargie_s
 **
 */
 
-#ifndef __JENKINS_PROJECT_HH__
-#define __JENKINS_PROJECT_HH__
+#ifndef __JENKINS_RSSPARSER_HH__
+#define __JENKINS_RSSPARSER_HH__
 
 #include <QObject>
 #include <QString>
+#include <QRegExp>
 #include <QUrl>
 
-class JenkinsProject : public QObject
+class QXmlStreamReader;
+
+namespace Jenkins {
+
+class RSSParser :
+    public QObject
 {
     Q_OBJECT;
 
 public:
-    enum State
-    {
-        UNKNOWN,
-        SUCCESS,
-        FAILURE,
-        UNSTABLE
-    };
+    typedef bool (RSSParser::*startHandler)(
+            const QStringRef &name);
+    typedef bool (RSSParser::*endHandler)(
+            const QStringRef &name);
 
-    JenkinsProject(const QString &name, const QUrl &uri);
-    JenkinsProject(const QString &name, const QUrl &uri, int m_num);
-    ~JenkinsProject();
+    RSSParser();
+    virtual ~RSSParser();
 
-    inline int getNum() const
-    {
-        return m_num;
-    }
+    /**
+     * @brief Start to parse a new xml stream.
+     *
+     * @details Stops to parse current document and start a new parsing
+     * context.
+     *
+     * @param[in] device the input device.
+     */
+    void parse(QIODevice *device);
 
-    inline const QString &getName() const
-    {
-        return m_name;
-    }
-
-    inline State getState() const
-    {
-        return m_state;
-    }
-
-    inline const QUrl &getUrl() const
-    {
-        return m_uri;
-    }
-
-public slots:
-    void update();
-
-signals:
-    void updated(const JenkinsProject &);
+    bool parserStart(const QStringRef &name);
+    bool entryStart(const QStringRef &name);
+    bool entryEnd(const QStringRef &name);
 
 protected:
-    QString m_name;
+    void clear();
+
+signals:
+    void projectEvent(const QString &, const QUrl &, int);
+
+protected slots:
+    void parse();
+
+protected:
+    QXmlStreamReader *m_xml;
+    bool m_accu;
+    QString m_data;
+    startHandler m_start;
+    endHandler m_end;
+    QRegExp m_titleEx;
+    QRegExp m_uriEx;
+
     QUrl m_uri;
+    QString m_name;
     int m_num;
-    State m_state;
 };
+
+}
 
 #endif
 

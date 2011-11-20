@@ -25,62 +25,66 @@
 */
 
 #include <QDesktopServices>
-#include "jenkinsMenu.hh"
-#include "jenkinsProject.hh"
+#include "Menu.hh"
+#include "Project.hh"
 
-JenkinsProjectAction::JenkinsProjectAction(
+namespace Jenkins {
+
+ProjectAction::ProjectAction(
         QObject *parent,
-        const JenkinsProject &project) :
+        const Project &project) :
     QAction(parent),
     m_proj(project)
 {
-    connect(&project, SIGNAL(updated(const JenkinsProject &)),
-            this, SLOT(updateEvent(const JenkinsProject &)));
+    connect(&project, SIGNAL(updated(const Project &)),
+            this, SLOT(updateEvent(const Project &)));
 
     connect(this, SIGNAL(triggered()), this, SLOT(open()));
     updateEvent(project);
 }
 
-JenkinsProjectAction::~JenkinsProjectAction()
+ProjectAction::~ProjectAction()
 {
 }
 
-void JenkinsProjectAction::open()
+void ProjectAction::open()
 {
     QDesktopServices::openUrl(m_proj.getUrl());
 }
 
-void JenkinsProjectAction::updateEvent(const JenkinsProject &proj)
+void ProjectAction::updateEvent(const Project &proj)
 {
     setText(proj.getName());
     switch (proj.getState())
     {
-        case JenkinsProject::UNKNOWN:
+        case Project::UNKNOWN:
             setIcon(QIcon(":/icons/gear"));
             break;
-        case JenkinsProject::SUCCESS:
+        case Project::SUCCESS:
             setIcon(QIcon(":/icons/blue"));
             break;
-        case JenkinsProject::FAILURE:
+        case Project::FAILURE:
             setIcon(QIcon(":/icons/red"));
             break;
-        case JenkinsProject::UNSTABLE:
+        case Project::UNSTABLE:
             setIcon(QIcon(":/icons/red"));
             break;
     };
 }
 
-JenkinsMenu::JenkinsMenu(QWidget *parent) :
+Menu::Menu(QWidget *parent) :
     QMenu(parent)
 {
 }
 
-JenkinsMenu::~JenkinsMenu()
+Menu::~Menu()
 {
 }
 
-void JenkinsMenu::addProject(const JenkinsProject &proj)
+void Menu::addProject(const Project &proj)
 {
-    addAction(new JenkinsProjectAction(this, proj));
+    addAction(new ProjectAction(this, proj));
+}
+
 }
 

@@ -31,58 +31,59 @@
 #include <QString>
 #include <QRegExp>
 #include <QUrl>
-#include <QXmlDefaultHandler>
-#include "jenkinsProject.hh"
+#include "Project.hh"
 
-class JenkinsBuildParser :
-    public QObject,
-    public QXmlDefaultHandler
+class QXmlStreamReader;
+
+namespace Jenkins {
+
+class BuildParser :
+    public QObject
 {
     Q_OBJECT;
 
 public:
-    typedef bool (JenkinsBuildParser::*startHandler)(
-            const QString &name,
-            const QXmlAttributes &attrs);
-    typedef bool (JenkinsBuildParser::*endHandler)(
-            const QString &name);
+    typedef bool (BuildParser::*startHandler)(
+            const QStringRef &name);
+    typedef bool (BuildParser::*endHandler)(
+            const QStringRef &name);
 
-    JenkinsBuildParser();
-    virtual ~JenkinsBuildParser();
+    BuildParser();
+    virtual ~BuildParser();
 
-    virtual bool startElement(
-            const QString &namespaceURI,
-            const QString &localName,
-            const QString &qName,
-            const QXmlAttributes &attrs);
-    virtual bool endElement(
-            const QString &namespaceURI,
-            const QString &localName,
-            const QString &qName);
-    virtual bool characters(
-            const QString &st);
+    /**
+     * @brief Start to parse a new xml stream.
+     *
+     * @details Stops to parse current document and start a new parsing
+     * context.
+     *
+     * @param[in] device the input device.
+     */
+    void parse(QIODevice *device);
 
-    virtual bool fatalError(
-            const QXmlParseException &exception);
-
-    bool parserStart(
-            const QString &name,
-            const QXmlAttributes &attrs);
-    bool waitEnd(
-            const QString &name);
-    bool resultEnd(
-            const QString &name);
-
-signals:
-    void projectEvent(JenkinsProject::State);
+    bool parserStart(const QStringRef &name);
+    bool waitEnd(const QStringRef &name);
+    bool resultEnd(const QStringRef &name);
 
 protected:
+    void clear();
+
+signals:
+    void projectEvent(Project::State);
+
+protected slots:
+    void parse();
+
+protected:
+    QXmlStreamReader *m_xml;
     bool m_accu;
     QString m_data;
     startHandler m_start;
     endHandler m_end;
     QString m_opened;
 };
+
+}
 
 #endif
 

@@ -26,14 +26,14 @@
 
 #include <QApplication>
 #include <QMessageBox>
-#include "jenkinsTray.hh"
+#include "Tray.hh"
 
 int main(int argc, char *argv[])
 {
     QApplication app(argc, argv);
-    Q_INIT_RESOURCE(jenkinsTray);
+    Q_INIT_RESOURCE(Tray);
 
-    JenkinsTray tray;
+    Jenkins::Tray tray;
     tray.show();
     return app.exec();
 }

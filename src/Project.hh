@@ -17,30 +17,73 @@
 **    misrepresented as being the original software.
 ** 3. This notice may not be removed or altered from any source distribution.
 **
-** jenkinsDownloader.hh
+** jenkinsProject.hh
 **
-**        Created on: Nov 17, 2011
+**        Created on: Nov 19, 2011
 **   Original Author: fargie_s
 **
 */
 
-#ifndef __JENKINS_DOWNLOADER_HH__
-#define __JENKINS_DOWNLOADER_HH__
+#ifndef __JENKINS_PROJECT_HH__
+#define __JENKINS_PROJECT_HH__
 
 #include <QObject>
-#include <QNetworkAccessManager>
-#include <QNetworkReply>
+#include <QString>
+#include <QUrl>
 
-class JenkinsDownloader : public QNetworkAccessManager
+namespace Jenkins {
+
+class Project : public QObject
 {
     Q_OBJECT;
 
 public:
-    JenkinsDownloader();
-    virtual ~JenkinsDownloader();
+    enum State
+    {
+        UNKNOWN,
+        SUCCESS,
+        FAILURE,
+        UNSTABLE
+    };
 
-    QNetworkReply *get(const QUrl &);
+    Project(const QString &name, const QUrl &uri);
+    Project(const QString &name, const QUrl &uri, int m_num);
+    ~Project();
+
+    inline int getNum() const
+    {
+        return m_num;
+    }
+
+    inline const QString &getName() const
+    {
+        return m_name;
+    }
+
+    inline State getState() const
+    {
+        return m_state;
+    }
+
+    inline const QUrl &getUrl() const
+    {
+        return m_uri;
+    }
+
+public slots:
+    void update();
+
+signals:
+    void updated(const Project &);
+
+protected:
+    QString m_name;
+    QUrl m_uri;
+    int m_num;
+    State m_state;
 };
+
+}
 
 #endif
 

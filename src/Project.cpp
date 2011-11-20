@@ -17,44 +17,34 @@
 **    misrepresented as being the original software.
 ** 3. This notice may not be removed or altered from any source distribution.
 **
-** jenkinsBuildEngine.hh
+** jenkinsProject.cpp
 **
 **        Created on: Nov 19, 2011
 **   Original Author: fargie_s
 **
 */
 
-#ifndef __JENKINS_PROJECT_ENGINE_HH__
-#define __JENKINS_PROJECT_ENGINE_HH__
+#include "Project.hh"
 
-#include <QObject>
-#include <QUrl>
-#include "jenkinsProject.hh"
+namespace Jenkins {
 
-class QIODevice;
-class QXmlSimpleReader;
-class QXmlInputSource;
-
-class JenkinsBuildEngine : public QObject
+Project::Project(const QString &name, const QUrl &uri) :
+    m_name(name), m_uri(uri), m_num(-1)
 {
-    Q_OBJECT;
+}
 
-public:
-    JenkinsBuildEngine();
-    virtual ~JenkinsBuildEngine();
+Project::Project(const QString &name, const QUrl &uri, int num) :
+    m_name(name), m_uri(uri), m_num(num)
+{
+}
 
-    bool parse(QIODevice *input);
+Project::~Project()
+{
+}
 
-signals:
-    void projectEvent(JenkinsProject::State);
+void Project::update()
+{
+}
 
-public slots:
-    void parseContinue();
-
-protected:
-    QXmlSimpleReader *m_reader;
-    QXmlInputSource  *m_source;
-};
-
-#endif
+}
 

@@ -17,30 +17,52 @@
 **    misrepresented as being the original software.
 ** 3. This notice may not be removed or altered from any source distribution.
 **
-** jenkinsProject.cpp
+** jenkinsMenu.hh
 **
 **        Created on: Nov 19, 2011
 **   Original Author: fargie_s
 **
 */
 
-#include "jenkinsProject.hh"
+#ifndef __JENKINS_MENU_HH__
+#define __JENKINS_MENU_HH__
 
-JenkinsProject::JenkinsProject(const QString &name, const QUrl &uri) :
-    m_name(name), m_uri(uri), m_num(-1)
+#include <QMenu>
+#include <QAction>
+
+namespace Jenkins {
+
+class Project;
+
+class ProjectAction : public QAction
 {
+    Q_OBJECT;
+public:
+    ProjectAction(
+            QObject *parent,
+            const Project &);
+    ~ProjectAction();
+
+protected slots:
+    void updateEvent(const Project &);
+
+    void open();
+
+protected:
+    const Project &m_proj;
+};
+
+class Menu : public QMenu
+{
+    Q_OBJECT;
+public:
+    Menu(QWidget *parent);
+    virtual ~Menu();
+
+    void addProject(const Project &);
+};
+
 }
 
-JenkinsProject::JenkinsProject(const QString &name, const QUrl &uri, int num) :
-    m_name(name), m_uri(uri), m_num(num)
-{
-}
-
-JenkinsProject::~JenkinsProject()
-{
-}
-
-void JenkinsProject::update()
-{
-}
+#endif
 
