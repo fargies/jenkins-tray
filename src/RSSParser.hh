@@ -60,15 +60,16 @@ public:
      */
     void parse(QIODevice *device);
 
+    void clear();
+
+protected:
     bool parserStart(const QStringRef &name);
     bool entryStart(const QStringRef &name);
     bool entryEnd(const QStringRef &name);
 
-protected:
-    void clear();
-
 signals:
     void projectEvent(const QString &, const QUrl &, int);
+    void finished();
 
 protected slots:
     void parse();

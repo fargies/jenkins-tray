@@ -67,7 +67,7 @@ void ProjectAction::updateEvent(const Project &proj)
             setIcon(QIcon(":/icons/red"));
             break;
         case Project::UNSTABLE:
-            setIcon(QIcon(":/icons/red"));
+            setIcon(QIcon(":/icons/yellow"));
             break;
     };
 }

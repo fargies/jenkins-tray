@@ -65,28 +65,31 @@ void BuildParser::clear()
     m_xml->clear();
     m_start = &BuildParser::parserStart;
     m_end = NULL;
+    m_accu = false;
+    m_data.clear();
 }
 
 void BuildParser::parse()
 {
     while (!m_xml->atEnd() && !m_xml->error())
     {
-        m_xml->readNext();
-        if (m_xml->isStartElement())
+        switch (m_xml->readNext())
         {
-            if (m_start)
-                (this->*m_start)(m_xml->name());
-        }
-        else if (m_xml->isEndElement())
-        {
-            if (m_end)
-                (this->*m_end)(m_xml->name());
-        }
-        else if (m_xml->isCharacters() && !m_xml->isWhitespace())
-        {
-            if (m_accu)
-                m_data += m_xml->text();
-
+            case QXmlStreamReader::StartElement:
+                if (m_start)
+                    (this->*m_start)(m_xml->name());
+                break;
+            case QXmlStreamReader::EndElement:
+                if (m_end)
+                    (this->*m_end)(m_xml->name());
+                break;
+            case QXmlStreamReader::Characters:
+                if (m_accu)
+                    m_data += m_xml->text();
+                break;
+            case QXmlStreamReader::EndDocument:
+                clear();
+                break;
         }
     }
     if (m_xml->error() && m_xml->error() !=
@@ -105,9 +108,11 @@ bool BuildParser::parserStart(const QStringRef &name)
         m_start = NULL;
         m_end = &BuildParser::resultEnd;
         m_accu = true;
+        m_data.clear();
     }
     else if (name != "freeStyleBuild" &&
-            name != "matrixBuild")
+            name != "matrixBuild" &&
+            name != "externalRun")
     {
         m_start = NULL;
         m_end = &BuildParser::waitEnd;
@@ -132,9 +137,7 @@ bool BuildParser::resultEnd(const QStringRef &name)
 
         emit projectEvent(state);
 
-        m_start = &BuildParser::parserStart;
-        m_end = NULL;
-        m_accu = false;
+        clear();
     }
     return true;
 }

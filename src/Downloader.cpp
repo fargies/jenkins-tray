@@ -46,5 +46,14 @@ Downloader::~Downloader()
 {
 }
 
+Downloader *Downloader::instance()
+{
+    if (m_instance == NULL)
+        m_instance = new Downloader();
+    return m_instance;
+}
+
+Downloader *Downloader::m_instance = NULL;
+
 }
 

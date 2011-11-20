@@ -31,16 +31,14 @@
 #include <QTimer>
 #include <QUrl>
 #include <QMap>
+#include "Project.hh"
 
 class QNetworkReply;
 
 namespace Jenkins {
 
-class Downloader;
 class RSSParser;
 class Menu;
-class Project;
-
 
 class Tray : public QSystemTrayIcon
 {
@@ -50,13 +48,19 @@ public:
     Tray();
     virtual ~Tray();
 
+protected:
+    void setState(Project::State);
+
 protected slots:
     void update();
 
     void updateEvent(const QString &name, const QUrl &uri, int buildNum);
+    void updateEvent(const Project &proj);
+
+    void updateFinished();
 
 protected:
-    Downloader *m_downloader;
+    Project::State m_globalState;
     RSSParser *m_parser;
     Menu *m_menu;
     QTimer m_timer;

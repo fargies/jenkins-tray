@@ -34,7 +34,6 @@ namespace Jenkins {
 
 Tray::Tray() :
     QSystemTrayIcon(QIcon(":/icons/gear")),
-    m_downloader(new Downloader()),
     m_parser(new RSSParser()),
     m_menu(new Menu(NULL)),
     m_timer()
@@ -44,6 +43,8 @@ Tray::Tray() :
 
     connect(m_parser, SIGNAL(projectEvent(const QString &, const QUrl &, int)),
             this, SLOT(updateEvent(const QString &, const QUrl &, int)));
+    connect(m_parser, SIGNAL(finished()),
+            this, SLOT(updateFinished()));
 
     setContextMenu(m_menu);
 
@@ -54,7 +55,6 @@ Tray::Tray() :
 
 Tray::~Tray()
 {
-    delete m_downloader;
     delete m_parser;
     delete m_menu;
 }
@@ -62,8 +62,59 @@ Tray::~Tray()
 void Tray::update()
 {
     /** @todo: parameterize the url */
-    QNetworkReply *reply = m_downloader->get(QUrl("http://localhost:8080/rssLatest"));
+    QNetworkReply *reply = Downloader::instance()->get(QUrl("http://localhost:8080/rssLatest"));
     m_parser->parse(reply);
+}
+
+void Tray::setState(Project::State state)
+{
+    m_globalState = state;
+    switch (state)
+    {
+        case Project::UNKNOWN:
+            setIcon(QIcon(":/icons/gear"));
+            break;
+        case Project::SUCCESS:
+            setIcon(QIcon(":/icons/blue"));
+            break;
+        case Project::FAILURE:
+            setIcon(QIcon(":/icons/red"));
+            break;
+        case Project::UNSTABLE:
+            setIcon(QIcon(":/icons/yellow"));
+            break;
+    };
+}
+
+void Tray::updateFinished()
+{
+    m_timer.setInterval(60 * 1000);
+    m_timer.start();
+}
+
+void Tray::updateEvent(const Project &proj)
+{
+    Project::State state = proj.getState();
+
+    if (m_globalState == Project::UNKNOWN)
+        setState(state);
+    else if (state != Project::UNKNOWN)
+    {
+        if (state < m_globalState)
+            setState(state);
+        else if (state > m_globalState)
+        {
+            state = Project::SUCCESS;
+            foreach(Project *p, m_projects)
+            {
+                if (p->getState() < state &&
+                        p->getState() != Project::UNKNOWN)
+                    state = p->getState();
+            }
+            if (state != m_globalState)
+                setState(state);
+        }
+    }
 }
 
 void Tray::updateEvent(const QString &name, const QUrl &uri, int buildNum)
@@ -72,14 +123,16 @@ void Tray::updateEvent(const QString &name, const QUrl &uri, int buildNum)
 
     if (it == m_projects.end())
     {
-        it = m_projects.insert(name, new Project(name, uri, buildNum));
-        it.value()->update();
+        it = m_projects.insert(name, new Project(name, uri));
+        connect(it.value(), SIGNAL(updated(const Project &)),
+                    this, SLOT(updateEvent(const Project &)));
+        it.value()->buildEvent(buildNum);
         m_menu->addProject(*(it.value()));
     }
     else
     {
         if (it.value()->getNum() != buildNum)
-            it.value()->update();
+            it.value()->buildEvent(buildNum);
     }
 }
 

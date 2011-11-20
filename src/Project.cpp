@@ -24,26 +24,56 @@
 **
 */
 
+#include "Downloader.hh"
 #include "Project.hh"
+#include "BuildParser.hh"
 
 namespace Jenkins {
 
 Project::Project(const QString &name, const QUrl &uri) :
+    m_parser(new BuildParser()),
     m_name(name), m_uri(uri), m_num(-1)
 {
+    connect(m_parser, SIGNAL(projectEvent(Project::State)),
+                this, SLOT(stateEvent(Project::State)));
 }
 
 Project::Project(const QString &name, const QUrl &uri, int num) :
+    m_parser(new BuildParser()),
     m_name(name), m_uri(uri), m_num(num)
 {
+    connect(m_parser, SIGNAL(projectEvent(Project::State)),
+                this, SLOT(stateEvent(Project::State)));
 }
 
 Project::~Project()
 {
+    delete m_parser;
+}
+
+void Project::stateEvent(Project::State state)
+{
+    m_state = state;
+    emit updated(*this);
+}
+
+void Project::buildEvent(int build)
+{
+    if (m_num != build)
+    {
+        m_state = Project::UNKNOWN;
+        m_num = build;
+        emit updated(*this);
+        update();
+    }
 }
 
 void Project::update()
 {
+    QString url(m_uri.toString());
+    url += "/";
+    url += QString::number(m_num) + "/api/xml";
+    m_parser->parse(Downloader::instance()->get(QUrl(url)));
 }
 
 }

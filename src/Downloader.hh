@@ -38,10 +38,15 @@ class Downloader : public QNetworkAccessManager
     Q_OBJECT;
 
 public:
-    Downloader();
+    static Downloader *instance();
     virtual ~Downloader();
 
     QNetworkReply *get(const QUrl &);
+
+protected:
+    Downloader();
+
+    static Downloader *m_instance;
 };
 
 }

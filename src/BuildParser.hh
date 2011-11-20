@@ -65,7 +65,6 @@ public:
     bool waitEnd(const QStringRef &name);
     bool resultEnd(const QStringRef &name);
 
-protected:
     void clear();
 
 signals:

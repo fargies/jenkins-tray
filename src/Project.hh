@@ -33,6 +33,8 @@
 
 namespace Jenkins {
 
+class BuildParser;
+
 class Project : public QObject
 {
     Q_OBJECT;
@@ -40,10 +42,10 @@ class Project : public QObject
 public:
     enum State
     {
-        UNKNOWN,
-        SUCCESS,
-        FAILURE,
-        UNSTABLE
+        SUCCESS = 3,
+        UNSTABLE = 2,
+        FAILURE = 1,
+        UNKNOWN = 0,
     };
 
     Project(const QString &name, const QUrl &uri);
@@ -70,13 +72,20 @@ public:
         return m_uri;
     }
 
-public slots:
+protected:
     void update();
 
 signals:
     void updated(const Project &);
 
+public slots:
+    void buildEvent(int build);
+
+protected slots:
+    void stateEvent(Project::State state);
+
 protected:
+    BuildParser *m_parser;
     QString m_name;
     QUrl m_uri;
     int m_num;
