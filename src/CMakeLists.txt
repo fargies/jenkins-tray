@@ -32,4 +32,5 @@ add_executable(jenkinsTray
     ${jenkinsTray_UIC})
 target_link_libraries(jenkinsTray ${QT_LIBRARIES})
 include_directories(${CMAKE_CURRENT_BINARY_DIR})
+install(TARGETS jenkinsTray RUNTIME DESTINATION bin)
 
