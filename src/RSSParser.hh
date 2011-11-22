@@ -60,6 +60,7 @@ public:
      */
     void parse(QIODevice *device);
 
+public slots:
     void clear();
 
 protected:

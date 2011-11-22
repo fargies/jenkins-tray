@@ -29,6 +29,7 @@
 #include "Downloader.hh"
 #include "Project.hh"
 #include "Menu.hh"
+#include "Settings.hh"
 
 namespace Jenkins {
 
@@ -36,6 +37,7 @@ Tray::Tray() :
     QSystemTrayIcon(QIcon(":/icons/gear")),
     m_parser(new RSSParser()),
     m_menu(new Menu(NULL)),
+    m_settings(new Settings()),
     m_timer()
 {
     connect(&m_timer, SIGNAL(timeout()),
@@ -46,7 +48,8 @@ Tray::Tray() :
     connect(m_parser, SIGNAL(finished()),
             this, SLOT(updateFinished()));
 
-    setContextMenu(m_menu);
+    connect(this, SIGNAL(activated(QSystemTrayIcon::ActivationReason)),
+            this, SLOT(activate(QSystemTrayIcon::ActivationReason)));
 
     m_timer.setInterval(1000);
     m_timer.setSingleShot(true);
@@ -57,12 +60,33 @@ Tray::~Tray()
 {
     delete m_parser;
     delete m_menu;
+    delete m_settings;
+}
+
+void Tray::activate(QSystemTrayIcon::ActivationReason reason)
+{
+    switch (reason)
+    {
+        case QSystemTrayIcon::Trigger:
+            m_menu->popup(QCursor::pos());
+            break;
+        case QSystemTrayIcon::Context:
+            if (m_settings->configure())
+            {
+                if (m_timer.isActive())
+                {
+                    m_timer.setInterval(0);
+                    m_timer.start();
+                }
+            }
+            break;
+    };
 }
 
 void Tray::update()
 {
-    /** @todo: parameterize the url */
-    QNetworkReply *reply = Downloader::instance()->get(QUrl("http://localhost:8080/rssLatest"));
+    QNetworkReply *reply =
+        Downloader::instance()->get(QUrl(m_settings->getUrl() + "/rssLatest"));
     m_parser->parse(reply);
 }
 
@@ -88,7 +112,7 @@ void Tray::setState(Project::State state)
 
 void Tray::updateFinished()
 {
-    m_timer.setInterval(60 * 1000);
+    m_timer.setInterval(m_settings->getInterval() * 1000);
     m_timer.start();
 }
 

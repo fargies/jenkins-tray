@@ -31,6 +31,8 @@
 int main(int argc, char *argv[])
 {
     QApplication app(argc, argv);
+    app.setQuitOnLastWindowClosed(false);
+
     Q_INIT_RESOURCE(Tray);
 
     Jenkins::Tray tray;

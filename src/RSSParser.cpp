@@ -52,6 +52,9 @@ void RSSParser::parse(QIODevice *device)
     {
         connect(device, SIGNAL(readyRead()),
                 this, SLOT(parse()));
+        /** @todo: fixme this signal should not be available here */
+        connect(device, SIGNAL(finished()),
+                this, SLOT(clear()));
         if (!device->atEnd())
             parse();
     }

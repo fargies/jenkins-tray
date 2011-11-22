@@ -17,58 +17,44 @@
 **    misrepresented as being the original software.
 ** 3. This notice may not be removed or altered from any source distribution.
 **
-** jenkins_tray.hh
+** Settings.hh
 **
-**        Created on: Nov 17, 2011
+**        Created on: Nov 21, 2011
 **   Original Author: fargie_s
 **
 */
 
-#ifndef __JENKINS_TRAY_HH__
-#define __JENKINS_TRAY_HH__
+#ifndef __JENKINS_SETTINGS_HH__
+#define __JENKINS_SETTINGS_HH__
 
-#include <QSystemTrayIcon>
-#include <QTimer>
-#include <QUrl>
-#include <QMap>
-#include "Project.hh"
-
-class QNetworkReply;
+#include <QString>
 
 namespace Jenkins {
 
-class RSSParser;
-class Menu;
-class Settings;
+#define DEFAULT_INTERVAL (60)
+#define DEFAULT_URI "http://localhost:8080"
 
-class Tray : public QSystemTrayIcon
+class Settings
 {
-    Q_OBJECT
-
 public:
-    Tray();
-    virtual ~Tray();
+    Settings();
+    ~Settings();
+
+    inline int getInterval() const
+    {
+        return m_interval;
+    }
+
+    inline const QString &getUrl() const
+    {
+        return m_url;
+    }
+
+    bool configure();
 
 protected:
-    void setState(Project::State);
-
-protected slots:
-    void update();
-
-    void updateEvent(const QString &name, const QUrl &uri, int buildNum);
-    void updateEvent(const Project &proj);
-
-    void updateFinished();
-
-    void activate(QSystemTrayIcon::ActivationReason);
-
-protected:
-    Project::State m_globalState;
-    RSSParser *m_parser;
-    Menu *m_menu;
-    Settings *m_settings;
-    QTimer m_timer;
-    QMap<QString, Project *> m_projects;
+    int m_interval;
+    QString m_url;
 };
 
 }

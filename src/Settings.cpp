@@ -17,61 +17,53 @@
 **    misrepresented as being the original software.
 ** 3. This notice may not be removed or altered from any source distribution.
 **
-** jenkins_tray.hh
+** Settings.cpp
 **
-**        Created on: Nov 17, 2011
+**        Created on: Nov 21, 2011
 **   Original Author: fargie_s
 **
 */
 
-#ifndef __JENKINS_TRAY_HH__
-#define __JENKINS_TRAY_HH__
-
-#include <QSystemTrayIcon>
-#include <QTimer>
-#include <QUrl>
-#include <QMap>
-#include "Project.hh"
-
-class QNetworkReply;
+#include <QSettings>
+#include "Settings.hh"
+#include "ui_Config.h"
 
 namespace Jenkins {
 
-class RSSParser;
-class Menu;
-class Settings;
-
-class Tray : public QSystemTrayIcon
+Settings::Settings()
 {
-    Q_OBJECT
+    QSettings settings("Jenkins", "JenkinsTray");
 
-public:
-    Tray();
-    virtual ~Tray();
-
-protected:
-    void setState(Project::State);
-
-protected slots:
-    void update();
-
-    void updateEvent(const QString &name, const QUrl &uri, int buildNum);
-    void updateEvent(const Project &proj);
-
-    void updateFinished();
-
-    void activate(QSystemTrayIcon::ActivationReason);
-
-protected:
-    Project::State m_globalState;
-    RSSParser *m_parser;
-    Menu *m_menu;
-    Settings *m_settings;
-    QTimer m_timer;
-    QMap<QString, Project *> m_projects;
-};
-
+    m_interval = settings.value("interval", DEFAULT_INTERVAL).toInt();
+    m_url = settings.value("url", DEFAULT_URI).toString();
 }
 
-#endif
+Settings::~Settings()
+{
+}
+
+bool Settings::configure()
+{
+    QDialog widget;
+    Ui::Config m_conf;
+
+    m_conf.setupUi(&widget);
+    m_conf.interval->setValue(m_interval);
+    m_conf.serverUri->setText(m_url);
+
+    if (widget.exec() == QDialog::Accepted)
+    {
+        m_interval = m_conf.interval->value();
+        m_url = m_conf.serverUri->text();
+
+        QSettings settings("Jenkins", "JenkinsTray");
+        settings.setValue("interval", m_interval);
+        settings.setValue("url", m_url);
+        settings.sync();
+        return true;
+    }
+    return false;
+}
+
+}
 
