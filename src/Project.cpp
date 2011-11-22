@@ -76,5 +76,10 @@ void Project::update()
     m_parser->parse(Downloader::instance()->get(QUrl(url)));
 }
 
+bool Project::isUpdating() const
+{
+    return m_parser->isParsing();
+}
+
 }
 

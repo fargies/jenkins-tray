@@ -39,6 +39,7 @@ BuildParser::BuildParser() :
 
 BuildParser::~BuildParser()
 {
+    clear();
     delete m_xml;
 }
 
@@ -61,6 +62,7 @@ void BuildParser::clear()
     {
         m_xml->device()->disconnect(this);
         m_xml->device()->deleteLater();
+        m_xml->setDevice(NULL);
     }
     m_xml->clear();
     m_start = &BuildParser::parserStart;
@@ -149,6 +151,11 @@ bool BuildParser::waitEnd(const QStringRef &name)
         m_start = &BuildParser::parserStart;
         m_end = NULL;
     }
+}
+
+bool BuildParser::isParsing() const
+{
+    return m_xml->device() != NULL;
 }
 
 }

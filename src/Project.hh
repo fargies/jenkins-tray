@@ -72,7 +72,8 @@ public:
         return m_uri;
     }
 
-protected:
+    bool isUpdating() const;
+
     void update();
 
 signals:

@@ -67,6 +67,8 @@ public:
 
     void clear();
 
+    bool isParsing() const;
+
 signals:
     void projectEvent(Project::State);
 

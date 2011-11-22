@@ -157,6 +157,9 @@ void Tray::updateEvent(const QString &name, const QUrl &uri, int buildNum)
     {
         if (it.value()->getNum() != buildNum)
             it.value()->buildEvent(buildNum);
+        else if (it.value()->getState() == Project::UNKNOWN &&
+                !it.value()->isUpdating())
+            it.value()->update();
     }
 }
 
