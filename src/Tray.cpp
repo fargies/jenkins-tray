@@ -70,6 +70,7 @@ void Tray::activate(QSystemTrayIcon::ActivationReason reason)
             m_menu->popup(QCursor::pos());
             break;
         case QSystemTrayIcon::Context:
+        case QSystemTrayIcon::DoubleClick:
             if (m_settings->configure())
             {
                 if (m_timer.isActive())
