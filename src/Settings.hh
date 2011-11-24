@@ -50,11 +50,17 @@ public:
         return m_url;
     }
 
+    inline bool isTrayNotifications() const
+    {
+        return m_trayNotif;
+    }
+
     bool configure();
 
 protected:
     int m_interval;
     QString m_url;
+    bool m_trayNotif;
 };
 
 }

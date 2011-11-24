@@ -25,6 +25,7 @@
 */
 
 #include <QSettings>
+#include <QSystemTrayIcon>
 #include "Settings.hh"
 #include "ui_Config.h"
 
@@ -36,6 +37,7 @@ Settings::Settings()
 
     m_interval = settings.value("interval", DEFAULT_INTERVAL).toInt();
     m_url = settings.value("url", DEFAULT_URI).toString();
+    m_trayNotif = settings.value("tray_notifications", false).toBool();
 }
 
 Settings::~Settings()
@@ -50,15 +52,22 @@ bool Settings::configure()
     m_conf.setupUi(&widget);
     m_conf.interval->setValue(m_interval);
     m_conf.serverUri->setText(m_url);
+    if (!QSystemTrayIcon::supportsMessages())
+        m_conf.trayNotifs->setDisabled(true);
+    m_conf.trayNotifs->setCheckState((m_trayNotif) ? Qt::Checked :
+            Qt::Unchecked);
 
     if (widget.exec() == QDialog::Accepted)
     {
         m_interval = m_conf.interval->value();
         m_url = m_conf.serverUri->text();
+        m_trayNotif = QSystemTrayIcon::supportsMessages() &&
+            (m_conf.trayNotifs->checkState() == Qt::Checked);
 
         QSettings settings("Jenkins", "JenkinsTray");
         settings.setValue("interval", m_interval);
         settings.setValue("url", m_url);
+        settings.setValue("tray_notifications", m_trayNotif);
         settings.sync();
         return true;
     }

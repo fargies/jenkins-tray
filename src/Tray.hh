@@ -52,13 +52,15 @@ public:
 protected:
     void setState(Project::State);
 
-protected slots:
     void update();
 
+protected slots:
     void updateEvent(const QString &name, const QUrl &uri, int buildNum);
     void updateEvent(const Project &proj);
 
     void updateFinished();
+
+    void timerEvent();
 
     void activate(QSystemTrayIcon::ActivationReason);
 
@@ -69,6 +71,7 @@ protected:
     Settings *m_settings;
     QTimer m_timer;
     QMap<QString, Project *> m_projects;
+    bool m_first;
 };
 
 }

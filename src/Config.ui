@@ -79,9 +79,9 @@
       <item row="0" column="0">
        <layout class="QGridLayout" name="gridLayout_3">
         <item row="0" column="0">
-         <widget class="QCheckBox" name="showMessages">
+         <widget class="QCheckBox" name="trayNotifs">
           <property name="text">
-           <string>Show messages</string>
+           <string>Show tray notifications</string>
           </property>
          </widget>
         </item>

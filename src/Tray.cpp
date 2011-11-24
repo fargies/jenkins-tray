@@ -38,10 +38,10 @@ Tray::Tray() :
     m_parser(new RSSParser()),
     m_menu(new Menu(NULL)),
     m_settings(new Settings()),
-    m_timer()
+    m_timer(), m_first(true)
 {
     connect(&m_timer, SIGNAL(timeout()),
-            this, SLOT(update()));
+            this, SLOT(timerEvent()));
 
     connect(m_parser, SIGNAL(projectEvent(const QString &, const QUrl &, int)),
             this, SLOT(updateEvent(const QString &, const QUrl &, int)));
@@ -51,9 +51,8 @@ Tray::Tray() :
     connect(this, SIGNAL(activated(QSystemTrayIcon::ActivationReason)),
             this, SLOT(activate(QSystemTrayIcon::ActivationReason)));
 
-    m_timer.setInterval(1000);
     m_timer.setSingleShot(true);
-    m_timer.start();
+    update();
 }
 
 Tray::~Tray()
@@ -81,6 +80,12 @@ void Tray::activate(QSystemTrayIcon::ActivationReason reason)
             }
             break;
     };
+}
+
+void Tray::timerEvent()
+{
+    m_first = false;
+    update();
 }
 
 void Tray::update()
@@ -138,6 +143,33 @@ void Tray::updateEvent(const Project &proj)
             if (state != m_globalState)
                 setState(state);
         }
+    }
+    if (m_settings->isTrayNotifications() && !m_first)
+    {
+        switch (proj.getState())
+        {
+            case Project::SUCCESS:
+                showMessage("Build Successful",
+                        proj.getName() + " #" + QString::number(proj.getNum()),
+                        QSystemTrayIcon::Information, 30 * 1000);
+                break;
+            case Project::UNSTABLE:
+                showMessage("Build Successful (unstable)",
+                        proj.getName() + " #" + QString::number(proj.getNum()),
+                        QSystemTrayIcon::Warning, 30 * 1000);
+                break;
+            case Project::FAILURE:
+                showMessage("Build Failed",
+                        proj.getName() + " #" + QString::number(proj.getNum()),
+                        QSystemTrayIcon::Critical, -1);
+                break;
+            case Project::UNKNOWN:
+                showMessage("Build in Progress",
+                        proj.getName() + " #" + QString::number(proj.getNum()),
+                        QSystemTrayIcon::Information, 10 * 1000);
+                break;
+        }
+
     }
 }
 
