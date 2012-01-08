@@ -35,8 +35,8 @@ int main(int argc, char *argv[])
 
     Q_INIT_RESOURCE(Tray);
 
-    Jenkins::Tray tray;
-    tray.show();
+    jenkins::Tray tray;
+    tray.start();
     return app.exec();
 }
 

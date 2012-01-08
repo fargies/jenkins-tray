@@ -30,7 +30,7 @@
 #include <QMenu>
 #include <QAction>
 
-namespace Jenkins {
+namespace jenkins {
 
 class Project;
 

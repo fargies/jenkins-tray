@@ -31,6 +31,7 @@ let g:makeprg='make -s -j5'
 let g:build_dir='@PROJECT_DIR@/build'
 let g:confprg='cmake @PROJECT_DIR@'
 let g:confopts=''
+set tags+=~/.vim/ctags/qt.tags
 
 " vim:set ft=vim:
 

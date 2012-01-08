@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2011 Fargier Sylvain <fargier.sylvain@free.fr>
+** Copyright (C) 2012 Fargier Sylvain <fargier.sylvain@free.fr>
 **
 ** This software is provided 'as-is', without any express or implied
 ** warranty.  In no event will the authors be held liable for any damages
@@ -17,39 +17,35 @@
 **    misrepresented as being the original software.
 ** 3. This notice may not be removed or altered from any source distribution.
 **
-** jenkinsDownloader.hh
+** stub_Settings.hh
 **
-**        Created on: Nov 17, 2011
+**        Created on: Jan 07, 2012
 **   Original Author: fargie_s
 **
 */
 
-#ifndef __JENKINS_DOWNLOADER_HH__
-#define __JENKINS_DOWNLOADER_HH__
+#ifndef __STUB_SETTINGS_HH__
+#define __STUB_SETTINGS_HH__
 
-#include <QObject>
-#include <QNetworkAccessManager>
-#include <QNetworkReply>
+#include "Settings.hh"
 
-namespace jenkins {
-
-class Downloader : public QNetworkAccessManager
+class SettingsStub : public jenkins::Settings
 {
-    Q_OBJECT;
-
 public:
-    static Downloader *instance();
-    virtual ~Downloader();
+    SettingsStub();
+    virtual ~SettingsStub();
 
-    QNetworkReply *get(const QUrl &);
+    inline void setInterval(int interval)
+    {
+        m_interval = interval;
+    }
 
-protected:
-    Downloader();
+    inline void setUrl(const QString &url)
+    {
+        m_url = url;
+    }
 
-    static Downloader *m_instance;
 };
-
-}
 
 #endif
 

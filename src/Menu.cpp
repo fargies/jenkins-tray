@@ -28,7 +28,7 @@
 #include "Menu.hh"
 #include "Project.hh"
 
-namespace Jenkins {
+namespace jenkins {
 
 ProjectAction::ProjectAction(
         QObject *parent,

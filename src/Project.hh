@@ -31,7 +31,7 @@
 #include <QString>
 #include <QUrl>
 
-namespace Jenkins {
+namespace jenkins {
 
 class BuildParser;
 

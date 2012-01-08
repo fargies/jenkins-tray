@@ -27,7 +27,7 @@
 #include <QXmlStreamReader>
 #include "RSSParser.hh"
 
-namespace Jenkins {
+namespace jenkins {
 
 RSSParser::RSSParser() :
     m_xml(new QXmlStreamReader()),

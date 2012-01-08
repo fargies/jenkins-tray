@@ -6,8 +6,7 @@ set(jenkinsTray_SOURCES
     Downloader.cpp
     Menu.cpp
     Project.cpp
-    Settings.cpp
-    main.cpp)
+    Settings.cpp)
 set(jenkinsTray_HEADERS
     Tray.hh
     RSSParser.hh
@@ -26,7 +25,14 @@ QT4_WRAP_UI(jenkinsTray_UIC ${jenkinsTray_UI})
 include(${QT_USE_FILE})
 add_definitions(${QT_DEFINITIONS})
 
+add_library(libjenkinsTray STATIC
+    ${jenkinsTray_SOURCES} ${jenkinsTray_HEADERS}
+    ${jenkinsTray_HEADERS_MOC} ${jenkinsTray_RESOURCES_RCC}
+    ${jenkinsTray_UIC})
+target_link_libraries(libjenkinsTray ${QT_LIBRARIES})
+
 add_executable(jenkinsTray
+    main.cpp
     ${jenkinsTray_SOURCES} ${jenkinsTray_HEADERS}
     ${jenkinsTray_HEADERS_MOC} ${jenkinsTray_RESOURCES_RCC}
     ${jenkinsTray_UIC})

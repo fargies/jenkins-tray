@@ -27,7 +27,7 @@
 #include <QXmlStreamReader>
 #include "BuildParser.hh"
 
-namespace Jenkins {
+namespace jenkins {
 
 BuildParser::BuildParser() :
     m_xml(new QXmlStreamReader()),

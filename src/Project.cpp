@@ -28,7 +28,7 @@
 #include "Project.hh"
 #include "BuildParser.hh"
 
-namespace Jenkins {
+namespace jenkins {
 
 Project::Project(const QString &name, const QUrl &uri) :
     m_parser(new BuildParser()),
@@ -71,7 +71,8 @@ void Project::buildEvent(int build)
 void Project::update()
 {
     QString url(m_uri.toString());
-    url += "/";
+    if (!url.endsWith('/'))
+            url += "/";
     url += QString::number(m_num) + "/api/xml";
     m_parser->parse(Downloader::instance()->get(QUrl(url)));
 }

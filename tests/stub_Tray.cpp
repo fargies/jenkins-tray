@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2011 Fargier Sylvain <fargier.sylvain@free.fr>
+** Copyright (C) 2012 Fargier Sylvain <fargier.sylvain@free.fr>
 **
 ** This software is provided 'as-is', without any express or implied
 ** warranty.  In no event will the authors be held liable for any damages
@@ -17,39 +17,37 @@
 **    misrepresented as being the original software.
 ** 3. This notice may not be removed or altered from any source distribution.
 **
-** jenkinsDownloader.hh
+** stub_tray.cpp
 **
-**        Created on: Nov 17, 2011
+**        Created on: Jan 07, 2012
 **   Original Author: fargie_s
 **
 */
 
-#ifndef __JENKINS_DOWNLOADER_HH__
-#define __JENKINS_DOWNLOADER_HH__
+#include <cppunit/TestAssert.h>
 
-#include <QObject>
-#include <QNetworkAccessManager>
-#include <QNetworkReply>
+#include <QApplication>
+#include <QDebug>
 
-namespace jenkins {
+#include "stub_Tray.hh"
+#include "stub_Settings.hh"
 
-class Downloader : public QNetworkAccessManager
+TrayStub::TrayStub() :
+    Tray()
 {
-    Q_OBJECT;
-
-public:
-    static Downloader *instance();
-    virtual ~Downloader();
-
-    QNetworkReply *get(const QUrl &);
-
-protected:
-    Downloader();
-
-    static Downloader *m_instance;
-};
-
+    delete m_settings;
+    m_settings = new SettingsStub();
 }
 
-#endif
+TrayStub::~TrayStub()
+{
+}
+
+SettingsStub &TrayStub::getSettingsStub()
+{
+    SettingsStub *stub = dynamic_cast<SettingsStub *>(m_settings);
+
+    CPPUNIT_ASSERT(stub != NULL);
+    return *stub;
+}
 

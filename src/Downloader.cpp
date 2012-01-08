@@ -27,7 +27,7 @@
 #include <QNetworkRequest>
 #include "Downloader.hh"
 
-namespace Jenkins {
+namespace jenkins {
 
 Downloader::Downloader()
 {

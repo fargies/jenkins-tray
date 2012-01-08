@@ -34,7 +34,7 @@
 
 class QXmlStreamReader;
 
-namespace Jenkins {
+namespace jenkins {
 
 class RSSParser :
     public QObject

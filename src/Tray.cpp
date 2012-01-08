@@ -31,7 +31,7 @@
 #include "Menu.hh"
 #include "Settings.hh"
 
-namespace Jenkins {
+namespace jenkins {
 
 Tray::Tray() :
     QSystemTrayIcon(QIcon(":/icons/gear")),
@@ -52,7 +52,6 @@ Tray::Tray() :
             this, SLOT(activate(QSystemTrayIcon::ActivationReason)));
 
     m_timer.setSingleShot(true);
-    update();
 }
 
 Tray::~Tray()
@@ -60,6 +59,13 @@ Tray::~Tray()
     delete m_parser;
     delete m_menu;
     delete m_settings;
+}
+
+void Tray::start()
+{
+    show();
+    m_timer.setInterval(0);
+    m_timer.start();
 }
 
 void Tray::activate(QSystemTrayIcon::ActivationReason reason)
@@ -85,8 +91,8 @@ void Tray::activate(QSystemTrayIcon::ActivationReason reason)
 
 void Tray::timerEvent()
 {
-    m_first = false;
     update();
+    m_first = false;
 }
 
 void Tray::update()

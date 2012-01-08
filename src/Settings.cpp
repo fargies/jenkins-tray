@@ -29,7 +29,7 @@
 #include "Settings.hh"
 #include "ui_Config.h"
 
-namespace Jenkins {
+namespace jenkins {
 
 Settings::Settings()
 {

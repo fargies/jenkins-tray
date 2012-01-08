@@ -35,7 +35,7 @@
 
 class QXmlStreamReader;
 
-namespace Jenkins {
+namespace jenkins {
 
 class BuildParser :
     public QObject

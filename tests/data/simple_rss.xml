@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+    <title>x86-target last builds only</title>
+    <link type="text/html" href="http://localhost:12345/" rel="alternate"/>
+    <updated>2011-11-09T13:19:26Z</updated>
+    <author>
+        <name>Jenkins Server</name>
+    </author>
+    <id>urn:uuid:903deee0-7bfa-11db-9fe1-0800200c9a66</id>
+    <entry>
+        <title>jenkins-target #13 (back to normal)</title>
+        <link type="text/html" href="http://localhost:12345/job/jenkins-target/13/" rel="alternate"/>
+        <id>tag:hudson.dev.java.net,2008:http://localhost:12345/job/jenkins-target/</id>
+        <published>2011-11-09T13:19:26Z</published>
+        <updated>2011-11-09T13:19:26Z</updated>
+    </entry>
+    <entry>
+        <title>jenkins-target-prepare #2 (stable)</title>
+        <link type="text/html" href="http://localhost:12345/job/jenkins-target-prepare/2/" rel="alternate"/>
+        <id>tag:hudson.dev.java.net,2008:http://localhost:12345/job/jenkins-target-prepare/</id>
+        <published>2011-11-11T12:53:37Z</published>
+        <updated>2011-11-11T12:53:37Z</updated>
+    </entry>
+    <entry>
+        <title>x86-target-srs #171 (back to normal)</title>
+        <link type="text/html" href="http://localhost:12345/job/x86-target-srs/171/" rel="alternate"/>
+        <id>tag:hudson.dev.java.net,2008:http://localhost:12345/job/x86-target-srs/</id>
+        <published>2012-01-06T10:30:24Z</published>
+        <updated>2012-01-06T10:30:24Z</updated>
+    </entry>
+    <entry>
+        <title>x86-target-srs-conf #61 (stable)</title>
+        <link type="text/html" href="http://localhost:12345/job/x86-target-srs-conf/61/" rel="alternate"/>
+        <id>tag:hudson.dev.java.net,2008:http://localhost:12345/job/x86-target-srs-conf/</id>
+        <published>2012-01-05T19:00:29Z</published>
+        <updated>2012-01-05T19:00:29Z</updated>
+    </entry>
+</feed>
+

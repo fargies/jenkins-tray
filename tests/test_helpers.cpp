@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2011 Fargier Sylvain <fargier.sylvain@free.fr>
+** Copyright (C) 2012 Fargier Sylvain <fargier.sylvain@free.fr>
 **
 ** This software is provided 'as-is', without any express or implied
 ** warranty.  In no event will the authors be held liable for any damages
@@ -17,39 +17,37 @@
 **    misrepresented as being the original software.
 ** 3. This notice may not be removed or altered from any source distribution.
 **
-** jenkinsDownloader.hh
+** test_helpers.cpp
 **
-**        Created on: Nov 17, 2011
+**        Created on: Jan 08, 2012
 **   Original Author: fargie_s
 **
 */
 
-#ifndef __JENKINS_DOWNLOADER_HH__
-#define __JENKINS_DOWNLOADER_HH__
+#include <QString>
+#include <QTextStream>
+#include <QDebug>
 
-#include <QObject>
-#include <QNetworkAccessManager>
-#include <QNetworkReply>
+#include "test_helpers.hh"
 
-namespace jenkins {
+const QString &getExePath() {
+    static QString exe_path;
 
-class Downloader : public QNetworkAccessManager
-{
-    Q_OBJECT;
+    if (exe_path.isEmpty())
+    {
+        char buff[150];
+        ssize_t size;
 
-public:
-    static Downloader *instance();
-    virtual ~Downloader();
+        if ((size = readlink(qPrintable(QString("/proc/%1/exe").arg(getpid())),
+                        buff, 150)) < 0)
+        {
+            exe_path.clear();
+            return exe_path;
+        }
+        exe_path = QByteArray(buff, size);
+        exe_path.truncate(exe_path.lastIndexOf('/'));
+    }
 
-    QNetworkReply *get(const QUrl &);
-
-protected:
-    Downloader();
-
-    static Downloader *m_instance;
-};
-
+    return exe_path;
 }
-
-#endif
 

@@ -1,0 +1,19 @@
+<freeStyleBuild>
+    <action>
+        <cause>
+            <shortDescription>Started by user anonymous</shortDescription>
+            <userName>anonymous</userName>
+        </cause>
+    </action>
+    <building>false</building>
+    <duration>2320201</duration>
+    <fullDisplayName>jenkins-target #13</fullDisplayName>
+    <id>2011-11-09_14-19-26</id>
+    <keepLog>false</keepLog>
+    <number>13</number>
+    <result>SUCCESS</result>
+    <timestamp>1320844766000</timestamp>
+    <url>http://172.16.11.90:8080/job/jenkins-target/13/</url>
+    <builtOn></builtOn>
+    <changeSet></changeSet>
+</freeStyleBuild>

@@ -35,7 +35,7 @@
 
 class QNetworkReply;
 
-namespace Jenkins {
+namespace jenkins {
 
 class RSSParser;
 class Menu;
@@ -48,6 +48,8 @@ class Tray : public QSystemTrayIcon
 public:
     Tray();
     virtual ~Tray();
+
+    void start();
 
 protected:
     void setState(Project::State);

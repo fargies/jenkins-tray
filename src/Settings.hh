@@ -29,7 +29,7 @@
 
 #include <QString>
 
-namespace Jenkins {
+namespace jenkins {
 
 #define DEFAULT_INTERVAL (60)
 #define DEFAULT_URI "http://localhost:8080"
@@ -38,7 +38,7 @@ class Settings
 {
 public:
     Settings();
-    ~Settings();
+    virtual ~Settings();
 
     inline int getInterval() const
     {
