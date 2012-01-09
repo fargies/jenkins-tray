@@ -17,12 +17,16 @@ add_library(testHelper SHARED
 target_link_libraries(testHelper ${CPPUNIT_LIBRARIES})
 
 set(test_HEADERS stub_Jenkins.hh stub_Tray.hh)
+
 QT4_WRAP_CPP(test_HEADERS_MOC ${test_HEADERS})
+QT4_ADD_RESOURCES(test_RESOURCES_RCC test_resources.qrc)
+
 set(test_SRCS
     stub_Tray.cpp
     stub_Settings.cpp stub_Settings.hh
     stub_Jenkins.cpp
-    test_simple.cpp ${test_HEADERS} ${test_HEADERS_MOC})
+    test_simple.cpp ${test_HEADERS}
+    ${test_HEADERS_MOC} ${test_RESOURCES_RCC})
 
 add_executable(test_all ${test_SRCS})
 target_link_libraries(test_all testHelper libjenkinsTray)

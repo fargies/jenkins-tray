@@ -1,0 +1,6 @@
+<!DOCTYPE RCC><RCC version="1.0">
+<qresource>
+    <file alias="simple_rss">data/simple_rss.xml</file>
+    <file alias="simple_target_13">data/simple_target_13.xml</file>
+</qresource>
+</RCC>

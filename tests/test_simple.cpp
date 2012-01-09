@@ -51,6 +51,7 @@ public:
         m_jenkins = new JenkinsServerStub(m_app);
 
         Q_INIT_RESOURCE(Tray);
+        Q_INIT_RESOURCE(test_resources);
         m_tray = new TrayStub();
     }
 
@@ -84,7 +85,7 @@ protected:
     void simple()
     {
         m_jenkins->add(QString("/simple/rssLatest"),
-                getExePath() + "/data/simple_rss.xml");
+                ":/simple_rss");
 
         SettingsStub &stub = m_tray->getSettingsStub();
         stub.setUrl(m_jenkins->baseUri() + "/simple");
@@ -107,7 +108,7 @@ protected:
         }
 
         m_jenkins->add(QString("/job/jenkins-target/13/api/xml"),
-                getExePath() + "/data/simple_target_13.xml");
+                ":/simple_target_13");
 
         QMap<QString, Project *>::const_iterator it = projs.find("jenkins-target");
         CPPUNIT_ASSERT(it != projs.end());
