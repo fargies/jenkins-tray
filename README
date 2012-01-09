@@ -1,0 +1,30 @@
+= Jenkins tray application =
+:author: Sylvain Fargier
+:email: fargier.sylvain@free.fr
+
+== Description ==
+This plugin monitors and displays Jenkins' status in your system tray.
+
+== Requirements ==
+- +QtCore+, +QtXml+, +QtNetwork+ >= 4.7
+- +CppUnit+ to compile using TESTS option.
+
+== Compilation, Installation & Tests ==
+
+To compile this project run the following script :
+
+--------------------------------------
+mkdir build ; cd build
+cmake -DTESTS=ON ..
+make
+
+# to install the project :
+make install
+
+# to run the unit tests :
+CTEST_OUTPUT_ON_FAILURE=1 make test
+
+# or run :
+./tests/test_all
+--------------------------------------
+

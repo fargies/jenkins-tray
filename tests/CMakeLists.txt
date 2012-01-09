@@ -1,4 +1,6 @@
 
+if (TESTS)
+
 link_directories(${CMAKE_BINARY_DIR}/src)
 include_directories(
     ${CMAKE_SOURCE_DIR}/src
@@ -8,9 +10,6 @@ include_directories(
 
 include(${QT_USE_FILE})
 add_definitions(${QT_DEFINITIONS})
-
-include(FindPkgConfig)
-pkg_check_modules(CPPUNIT cppunit)
 
 add_library(testHelper SHARED
     test_main.cpp
@@ -29,4 +28,6 @@ add_executable(test_all ${test_SRCS})
 target_link_libraries(test_all testHelper libjenkinsTray)
 
 add_test(test_all ${CMAKE_CURRENT_BINARY_DIR}/test_all)
+
+endif()
 
