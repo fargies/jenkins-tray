@@ -35,6 +35,7 @@ namespace jenkins {
 
 Tray::Tray() :
     QSystemTrayIcon(QIcon(":/icons/gear")),
+    m_globalState(Project::UNKNOWN),
     m_parser(new RSSParser()),
     m_menu(new Menu(NULL)),
     m_settings(new Settings()),
