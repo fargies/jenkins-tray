@@ -53,6 +53,12 @@ Downloader *Downloader::instance()
     return m_instance;
 }
 
+void Downloader::destroy()
+{
+    if (m_instance != NULL)
+        delete m_instance;
+}
+
 Downloader *Downloader::m_instance = NULL;
 
 }

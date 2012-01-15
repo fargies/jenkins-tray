@@ -187,7 +187,7 @@ void Tray::updateEvent(const QString &name, const QUrl &uri, int buildNum)
 
     if (it == m_projects.end())
     {
-        it = m_projects.insert(name, new Project(name, uri));
+        it = m_projects.insert(name, new Project(this, name, uri));
         connect(it.value(), SIGNAL(updated(const Project &)),
                     this, SLOT(updateEvent(const Project &)));
         it.value()->buildEvent(buildNum);

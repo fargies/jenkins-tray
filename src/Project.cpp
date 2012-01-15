@@ -30,7 +30,8 @@
 
 namespace jenkins {
 
-Project::Project(const QString &name, const QUrl &uri) :
+Project::Project(QObject *parent, const QString &name, const QUrl &uri) :
+    QObject(parent),
     m_parser(new BuildParser()),
     m_name(name), m_uri(uri), m_num(-1)
 {
@@ -38,7 +39,8 @@ Project::Project(const QString &name, const QUrl &uri) :
                 this, SLOT(stateEvent(Project::State)));
 }
 
-Project::Project(const QString &name, const QUrl &uri, int num) :
+Project::Project(QObject *parent, const QString &name, const QUrl &uri, int num) :
+    QObject(parent),
     m_parser(new BuildParser()),
     m_name(name), m_uri(uri), m_num(num)
 {

@@ -48,8 +48,8 @@ public:
         UNKNOWN = 0,
     };
 
-    Project(const QString &name, const QUrl &uri);
-    Project(const QString &name, const QUrl &uri, int m_num);
+    Project(QObject *parent, const QString &name, const QUrl &uri);
+    Project(QObject *parent, const QString &name, const QUrl &uri, int m_num);
     ~Project();
 
     inline int getNum() const

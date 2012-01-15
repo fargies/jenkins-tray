@@ -39,6 +39,8 @@ class Downloader : public QNetworkAccessManager
 
 public:
     static Downloader *instance();
+    static void destroy();
+
     virtual ~Downloader();
 
     QNetworkReply *get(const QUrl &);

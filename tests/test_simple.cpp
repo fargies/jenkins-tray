@@ -30,6 +30,7 @@
 #include <QApplication>
 
 #include "RSSParser.hh"
+#include "Downloader.hh"
 
 #include "test_helpers.hh"
 #include "stub_Tray.hh"
@@ -47,7 +48,10 @@ class simpleTest : public CppUnit::TestFixture
 public:
     void setUp()
     {
-        m_app = new QApplication(0, NULL);
+        m_argc = 0;
+
+        m_app = new QApplication(m_argc, m_argv);
+        m_app->setQuitOnLastWindowClosed(false);
         m_jenkins = new JenkinsServerStub(m_app);
 
         Q_INIT_RESOURCE(Tray);
@@ -59,10 +63,13 @@ public:
     {
         delete m_jenkins;
         delete m_tray;
+        jenkins::Downloader::destroy();
         delete m_app;
     }
 
 protected:
+    int m_argc;
+    char *m_argv[0];
     JenkinsServerStub *m_jenkins;
     QApplication      *m_app;
     TrayStub          *m_tray;
@@ -82,6 +89,17 @@ protected:
         return !timer.isActive();
     }
 
+    /**
+     * @details
+     * Tests details :
+     *  - First we create stub informations in JenkinsServerStub.
+     *  - Then the tray is launched.
+     *  - Loaded information is checked.
+     *  - Server's information is modified.
+     *  - Since the Tray application has an RSS polling interval of 1 it will
+     *  update the information.
+     *  - Updated information is checked.
+     */
     void simple()
     {
         m_jenkins->add(QString("/simple/rssLatest"),
@@ -95,7 +113,7 @@ protected:
 
         QObject::connect(m_tray->getParser(), SIGNAL(finished()), m_app,
                 SLOT(quit()));
-        CPPUNIT_ASSERT(!wait(3000));
+        CPPUNIT_ASSERT(!wait(30000));
         QObject::disconnect(m_tray->getParser(), SIGNAL(finished()), m_app,
                 SLOT(quit()));
 
@@ -114,7 +132,7 @@ protected:
         CPPUNIT_ASSERT(it != projs.end());
         QObject::connect(it.value(), SIGNAL(updated(const Project &)),
                 m_app, SLOT(quit()));
-        CPPUNIT_ASSERT(!wait(3000));
+        CPPUNIT_ASSERT(!wait(30000));
 
         it = projs.find("jenkins-target");
         CPPUNIT_ASSERT(it != projs.end());
