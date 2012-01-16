@@ -77,7 +77,7 @@ void RSSParser::clear()
 
 void RSSParser::parse()
 {
-    while (!m_xml->atEnd() && !m_xml->error())
+    while (!m_xml->atEnd())
     {
         switch (m_xml->readNext())
         {
@@ -97,6 +97,8 @@ void RSSParser::parse()
                 clear();
                 break;
         }
+        if (m_xml->error() != 0)
+            break;
     }
     if (m_xml->error() && m_xml->error() !=
             QXmlStreamReader::PrematureEndOfDocumentError)
