@@ -33,11 +33,17 @@ Downloader::Downloader()
 {
 }
 
-QNetworkReply *Downloader::get(const QUrl &url)
+QNetworkReply *Downloader::get(const QUrl &url, bool auth)
 {
     QNetworkRequest request;
     request.setUrl(url);
     request.setRawHeader("User-Agent", "JenkinsTray 1.0");
+
+    /* activate the preemptive authentication by giving a wrong login/password,
+     * authenticationRequired signal will be triggered and next requests will
+     * use the cached tokens */
+    if (auth)
+        request.setRawHeader("Authorization", "Basic " +  QByteArray(":").toBase64());
 
     return QNetworkAccessManager::get(request);
 }

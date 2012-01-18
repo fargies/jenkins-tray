@@ -38,6 +38,8 @@ Settings::Settings()
     m_interval = settings.value("interval", DEFAULT_INTERVAL).toInt();
     m_url = settings.value("url", DEFAULT_URI).toString();
     m_trayNotif = settings.value("tray_notifications", false).toBool();
+    m_user = settings.value("user").toString();
+    m_token = settings.value("token").toString();
 }
 
 Settings::~Settings()
@@ -52,6 +54,9 @@ bool Settings::configure()
     m_conf.setupUi(&widget);
     m_conf.interval->setValue(m_interval);
     m_conf.serverUri->setText(m_url);
+    m_conf.user->setText(m_user);
+    m_conf.auth_token->setText(m_token);
+
     if (!QSystemTrayIcon::supportsMessages())
         m_conf.trayNotifs->setDisabled(true);
     m_conf.trayNotifs->setCheckState((m_trayNotif) ? Qt::Checked :
@@ -63,11 +68,15 @@ bool Settings::configure()
         m_url = m_conf.serverUri->text();
         m_trayNotif = QSystemTrayIcon::supportsMessages() &&
             (m_conf.trayNotifs->checkState() == Qt::Checked);
+        m_user = m_conf.user->text();
+        m_token = m_conf.auth_token->text();
 
         QSettings settings("Jenkins", "JenkinsTray");
         settings.setValue("interval", m_interval);
         settings.setValue("url", m_url);
         settings.setValue("tray_notifications", m_trayNotif);
+        settings.setValue("user", m_user);
+        settings.setValue("token", m_token);
         settings.sync();
         return true;
     }

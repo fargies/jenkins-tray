@@ -34,6 +34,7 @@
 #include "Project.hh"
 
 class QNetworkReply;
+class QAuthenticator;
 
 namespace jenkins {
 
@@ -65,6 +66,8 @@ protected slots:
     void timerEvent();
 
     void activate(QSystemTrayIcon::ActivationReason);
+
+    void authenticationRequest(QNetworkReply *, QAuthenticator *);
 
 protected:
     Project::State m_globalState;

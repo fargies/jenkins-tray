@@ -24,6 +24,8 @@
 **
 */
 
+#include <QAuthenticator>
+
 #include "Tray.hh"
 #include "RSSParser.hh"
 #include "Downloader.hh"
@@ -52,6 +54,10 @@ Tray::Tray() :
     connect(this, SIGNAL(activated(QSystemTrayIcon::ActivationReason)),
             this, SLOT(activate(QSystemTrayIcon::ActivationReason)));
 
+    connect(Downloader::instance(),
+            SIGNAL(authenticationRequired(QNetworkReply*,QAuthenticator*)),
+            this, SLOT(authenticationRequest(QNetworkReply*,QAuthenticator*)));
+
     m_timer.setSingleShot(true);
 }
 
@@ -69,6 +75,23 @@ void Tray::start()
     m_timer.start();
 }
 
+void Tray::authenticationRequest(QNetworkReply *reply, QAuthenticator *ator)
+{
+    if ((ator->user() != m_settings->getUser())
+            || (ator->password() != m_settings->getAuthToken()))
+    {
+        ator->setUser(m_settings->getUser());
+        ator->setPassword(m_settings->getAuthToken());
+    }
+    else
+    {
+        showMessage("Authentication failed",
+                "Wrong login or token",
+                QSystemTrayIcon::Critical, 30 * 1000);
+        reply->abort();
+    }
+}
+
 void Tray::activate(QSystemTrayIcon::ActivationReason reason)
 {
     switch (reason)
@@ -80,6 +103,12 @@ void Tray::activate(QSystemTrayIcon::ActivationReason reason)
         case QSystemTrayIcon::DoubleClick:
             if (m_settings->configure())
             {
+                m_menu->clear();
+                foreach(Project *p, m_projects)
+                {
+                    p->deleteLater();
+                }
+                m_projects.clear();
                 if (m_timer.isActive())
                 {
                     m_timer.setInterval(0);
@@ -99,7 +128,8 @@ void Tray::timerEvent()
 void Tray::update()
 {
     QNetworkReply *reply =
-        Downloader::instance()->get(QUrl(m_settings->getUrl() + "/rssLatest"));
+        Downloader::instance()->get(QUrl(m_settings->getUrl() + "/rssLatest"),
+                !m_settings->getUser().isEmpty());
     m_parser->parse(reply);
 }
 

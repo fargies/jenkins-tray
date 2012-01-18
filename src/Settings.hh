@@ -50,6 +50,16 @@ public:
         return m_url;
     }
 
+    inline const QString &getAuthToken() const
+    {
+        return m_token;
+    }
+
+    inline const QString &getUser() const
+    {
+        return m_user;
+    }
+
     inline bool isTrayNotifications() const
     {
         return m_trayNotif;
@@ -60,6 +70,8 @@ public:
 protected:
     int m_interval;
     QString m_url;
+    QString m_user;
+    QString m_token;
     bool m_trayNotif;
 };
 

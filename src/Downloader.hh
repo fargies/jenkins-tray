@@ -43,7 +43,7 @@ public:
 
     virtual ~Downloader();
 
-    QNetworkReply *get(const QUrl &);
+    QNetworkReply *get(const QUrl &, bool auth = false);
 
 protected:
     Downloader();
