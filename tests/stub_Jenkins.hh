@@ -10,7 +10,8 @@
 #include <QTcpServer>
 #include <QMap>
 #include <QString>
-#include <QIODevice>
+
+class QTcpSocket;
 
 class JenkinsServerStub : public QTcpServer
 {
@@ -34,13 +35,21 @@ public:
 
     QString baseUri() const;
 
+    void setAuth(const QString &user, const QString &pass);
+
 private slots:
     void readClient();
 
     void discardClient();
 
 protected:
+    void sendFile(const QString &file, QTcpSocket &socket);
+    void sendAuthRequired(QTcpSocket &socket);
+    void sendForbidden(QTcpSocket &socket);
+    bool isAuth() const;
+
     QMap<QString, QString> m_data;
+    QByteArray m_auth_data;
 };
 
 #endif

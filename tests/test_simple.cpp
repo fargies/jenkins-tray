@@ -43,6 +43,7 @@ class simpleTest : public CppUnit::TestFixture
 {
     CPPUNIT_TEST_SUITE(simpleTest);
     CPPUNIT_TEST(simple);
+    CPPUNIT_TEST(auth);
     CPPUNIT_TEST_SUITE_END();
 
 public:
@@ -137,6 +138,46 @@ protected:
         it = projs.find("jenkins-target");
         CPPUNIT_ASSERT(it != projs.end());
         CPPUNIT_ASSERT_EQUAL(Project::SUCCESS, it.value()->getState());
+    }
+
+    void auth()
+    {
+        m_jenkins->setAuth("bob", "bob's token");
+        m_jenkins->add(QString("/simple/rssLatest"),
+                ":/simple_rss");
+
+        SettingsStub &stub = m_tray->getSettingsStub();
+        stub.setUrl(m_jenkins->baseUri() + "/simple");
+        stub.setInterval(1);
+        stub.setUser("");
+        stub.setAuthToken("");
+
+        m_tray->start();
+
+        QObject::connect(m_tray, SIGNAL(finished()), m_app,
+                SLOT(quit()));
+        CPPUNIT_ASSERT(!wait(30000));
+        CPPUNIT_ASSERT(m_tray->getProjects().isEmpty());
+
+        stub.setUser("roger");
+        stub.setAuthToken("roger's token");
+        m_tray->start(); /* restart the timer */
+
+        CPPUNIT_ASSERT(!wait(30000));
+        CPPUNIT_ASSERT(m_tray->getProjects().isEmpty());
+
+        stub.setUser("bob");
+        stub.setAuthToken("bob's token");
+        m_tray->start(); /* restart the timer */
+
+        CPPUNIT_ASSERT(!wait(30000));
+        QMap<QString, Project *> &projs = m_tray->getProjects();
+        CPPUNIT_ASSERT_EQUAL(4, projs.size());
+
+        foreach(Project *p, projs)
+        {
+            CPPUNIT_ASSERT_EQUAL(Project::UNKNOWN, p->getState());
+        }
     }
 };
 

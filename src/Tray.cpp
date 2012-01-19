@@ -33,6 +33,8 @@
 #include "Menu.hh"
 #include "Settings.hh"
 
+#define NETWORK_RETRY_DELAY (30 * 1000)
+
 namespace jenkins {
 
 Tray::Tray() :
@@ -48,8 +50,6 @@ Tray::Tray() :
 
     connect(m_parser, SIGNAL(projectEvent(const QString &, const QUrl &, int)),
             this, SLOT(updateEvent(const QString &, const QUrl &, int)));
-    connect(m_parser, SIGNAL(finished()),
-            this, SLOT(updateFinished()));
 
     connect(this, SIGNAL(activated(QSystemTrayIcon::ActivationReason)),
             this, SLOT(activate(QSystemTrayIcon::ActivationReason)));
@@ -75,6 +75,19 @@ void Tray::start()
     m_timer.start();
 }
 
+void Tray::stop()
+{
+    m_timer.stop();
+    QIODevice *dev = m_parser->device();
+    if (dev)
+    {
+        dev->disconnect(this);
+        dev->close();
+        m_parser->clear();
+        emit finished();
+    }
+}
+
 void Tray::authenticationRequest(QNetworkReply *reply, QAuthenticator *ator)
 {
     if ((ator->user() != m_settings->getUser())
@@ -86,10 +99,41 @@ void Tray::authenticationRequest(QNetworkReply *reply, QAuthenticator *ator)
     else
     {
         showMessage("Authentication failed",
-                "Wrong login or token",
-                QSystemTrayIcon::Critical, 30 * 1000);
-        reply->abort();
+                "Wrong user or token",
+                QSystemTrayIcon::Critical, NETWORK_RETRY_DELAY);
+        stop();
+        m_timer.setInterval(NETWORK_RETRY_DELAY);
+        m_timer.start();
     }
+}
+
+void Tray::networkError(QNetworkReply::NetworkError err)
+{
+    QNetworkReply *reply = qobject_cast<QNetworkReply *>(sender());
+    switch (err)
+    {
+        case QNetworkReply::ContentAccessDenied:
+        case QNetworkReply::ContentOperationNotPermittedError:
+            showMessage("Authentication required",
+                    "User and token required",
+                    QSystemTrayIcon::Critical, NETWORK_RETRY_DELAY);
+            break;
+        default:
+            if (reply)
+            {
+                showMessage("Network error",
+                        reply->errorString(),
+                        QSystemTrayIcon::Critical, NETWORK_RETRY_DELAY);
+            }
+            else
+                showMessage("Network error",
+                        "Unkown critical error",
+                        QSystemTrayIcon::Critical, NETWORK_RETRY_DELAY);
+            break;
+    }
+    stop();
+    m_timer.setInterval(NETWORK_RETRY_DELAY);
+    m_timer.start();
 }
 
 void Tray::activate(QSystemTrayIcon::ActivationReason reason)
@@ -101,6 +145,9 @@ void Tray::activate(QSystemTrayIcon::ActivationReason reason)
             break;
         case QSystemTrayIcon::Context:
         case QSystemTrayIcon::DoubleClick:
+
+            stop();
+
             if (m_settings->configure())
             {
                 m_menu->clear();
@@ -109,12 +156,9 @@ void Tray::activate(QSystemTrayIcon::ActivationReason reason)
                     p->deleteLater();
                 }
                 m_projects.clear();
-                if (m_timer.isActive())
-                {
-                    m_timer.setInterval(0);
-                    m_timer.start();
-                }
             }
+            m_timer.setInterval(0);
+            m_timer.start();
             break;
     };
 }
@@ -127,9 +171,15 @@ void Tray::timerEvent()
 
 void Tray::update()
 {
-    QNetworkReply *reply =
-        Downloader::instance()->get(QUrl(m_settings->getUrl() + "/rssLatest"),
-                !m_settings->getUser().isEmpty());
+    Downloader *down = Downloader::instance();
+
+    down->enableAuth(!m_settings->getUser().isEmpty());
+    QNetworkReply *reply = down->get(QUrl(m_settings->getUrl() +
+                "/rssLatest"));
+    connect(reply, SIGNAL(error(QNetworkReply::NetworkError)),
+            this, SLOT(networkError(QNetworkReply::NetworkError)));
+    connect(reply, SIGNAL(finished()),
+            this, SLOT(updateFinished()));
     m_parser->parse(reply);
 }
 
@@ -155,8 +205,12 @@ void Tray::setState(Project::State state)
 
 void Tray::updateFinished()
 {
-    m_timer.setInterval(m_settings->getInterval() * 1000);
-    m_timer.start();
+    emit finished();
+    if (!m_timer.isActive())
+    {
+        m_timer.setInterval(m_settings->getInterval() * 1000);
+        m_timer.start();
+    }
 }
 
 void Tray::updateEvent(const Project &proj)

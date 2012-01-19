@@ -65,7 +65,6 @@ void RSSParser::clear()
     if (m_xml->device() != NULL)
     {
         m_xml->device()->disconnect(this);
-        m_xml->device()->deleteLater();
         emit finished();
     }
     m_xml->clear();
@@ -107,6 +106,11 @@ void RSSParser::parse()
                 m_xml->lineNumber(), qPrintable(m_xml->errorString()));
         clear();
     }
+}
+
+QIODevice *RSSParser::device()
+{
+    return m_xml->device();
 }
 
 bool RSSParser::parserStart(const QStringRef &name)

@@ -61,7 +61,6 @@ void BuildParser::clear()
     if (m_xml->device() != NULL)
     {
         m_xml->device()->disconnect(this);
-        m_xml->device()->deleteLater();
         m_xml->setDevice(NULL);
     }
     m_xml->clear();

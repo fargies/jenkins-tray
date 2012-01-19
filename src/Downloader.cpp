@@ -29,11 +29,12 @@
 
 namespace jenkins {
 
-Downloader::Downloader()
+Downloader::Downloader() :
+    m_auth(false)
 {
 }
 
-QNetworkReply *Downloader::get(const QUrl &url, bool auth)
+QNetworkReply *Downloader::get(const QUrl &url)
 {
     QNetworkRequest request;
     request.setUrl(url);
@@ -42,10 +43,15 @@ QNetworkReply *Downloader::get(const QUrl &url, bool auth)
     /* activate the preemptive authentication by giving a wrong login/password,
      * authenticationRequired signal will be triggered and next requests will
      * use the cached tokens */
-    if (auth)
+    if (m_auth)
         request.setRawHeader("Authorization", "Basic " +  QByteArray(":").toBase64());
 
     return QNetworkAccessManager::get(request);
+}
+
+void Downloader::enableAuth(bool enable)
+{
+    m_auth = enable;
 }
 
 Downloader::~Downloader()
@@ -62,7 +68,10 @@ Downloader *Downloader::instance()
 void Downloader::destroy()
 {
     if (m_instance != NULL)
+    {
         delete m_instance;
+        m_instance = NULL;
+    }
 }
 
 Downloader *Downloader::m_instance = NULL;

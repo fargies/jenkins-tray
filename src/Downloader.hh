@@ -43,10 +43,14 @@ public:
 
     virtual ~Downloader();
 
-    QNetworkReply *get(const QUrl &, bool auth = false);
+    QNetworkReply *get(const QUrl &);
+
+    void enableAuth(bool enable);
 
 protected:
     Downloader();
+
+    bool m_auth;
 
     static Downloader *m_instance;
 };

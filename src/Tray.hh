@@ -31,9 +31,9 @@
 #include <QTimer>
 #include <QUrl>
 #include <QMap>
+#include <QNetworkReply>
 #include "Project.hh"
 
-class QNetworkReply;
 class QAuthenticator;
 
 namespace jenkins {
@@ -52,6 +52,8 @@ public:
 
     void start();
 
+    void stop();
+
 protected:
     void setState(Project::State);
 
@@ -68,6 +70,11 @@ protected slots:
     void activate(QSystemTrayIcon::ActivationReason);
 
     void authenticationRequest(QNetworkReply *, QAuthenticator *);
+
+    void networkError(QNetworkReply::NetworkError);
+
+signals:
+    void finished();
 
 protected:
     Project::State m_globalState;

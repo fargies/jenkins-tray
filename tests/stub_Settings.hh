@@ -45,6 +45,16 @@ public:
         m_url = url;
     }
 
+    inline void setUser(const QString &user)
+    {
+        m_user = user;
+    }
+
+    inline void setAuthToken(const QString &token)
+    {
+        m_token = token;
+    }
+
 };
 
 #endif

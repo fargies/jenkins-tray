@@ -60,6 +60,8 @@ public:
      */
     void parse(QIODevice *device);
 
+    QIODevice *device();
+
 public slots:
     void clear();
 
