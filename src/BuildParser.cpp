@@ -104,20 +104,23 @@ void BuildParser::parse()
 
 bool BuildParser::parserStart(const QStringRef &name)
 {
-    if (name == "result")
+    QString str_name = name.toString(); /* Qt 4.7 doesn't implement endsWith on
+                                           QStringRef */
+    if (str_name == "result")
     {
         m_start = NULL;
         m_end = &BuildParser::resultEnd;
         m_accu = true;
         m_data.clear();
     }
-    else if (name != "freeStyleBuild" &&
-            name != "matrixBuild" &&
-            name != "externalRun")
+    else if (str_name != "freeStyleBuild" &&
+            str_name != "matrixBuild" &&
+            str_name != "externalRun" &&
+            !str_name.endsWith("Build"))
     {
         m_start = NULL;
         m_end = &BuildParser::waitEnd;
-        m_opened = name.toString();
+        m_opened = str_name;
     }
     return true;
 }
