@@ -46,7 +46,9 @@ QNetworkReply *Downloader::get(const QUrl &url)
     if (m_auth)
         request.setRawHeader("Authorization", "Basic " +  QByteArray(":").toBase64());
 
-    return QNetworkAccessManager::get(request);
+    QNetworkReply *reply = QNetworkAccessManager::get(request);
+    connect(reply, SIGNAL(finished()), reply, SLOT(deleteLater()));
+    return reply;
 }
 
 void Downloader::enableAuth(bool enable)
