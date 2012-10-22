@@ -30,6 +30,9 @@
 
 namespace jenkins {
 
+#define XML_API_SUFFIX "/api/xml"
+#define XML_API_SUFFIX_LEN (sizeof (XML_API_SUFFIX) - 1)
+
 Project::Project(QObject *parent, const QString &name, const QUrl &uri) :
     QObject(parent),
     m_parser(new BuildParser()),
@@ -66,17 +69,54 @@ void Project::buildEvent(int build)
         m_state = Project::UNKNOWN;
         m_num = build;
         emit updated(*this);
-        update();
+        update(m_uri);
     }
 }
 
-void Project::update()
+void Project::update(const QUrl &uri)
 {
-    QString url(m_uri.toString());
+    QString url(uri.toString());
     if (!url.endsWith('/'))
             url += "/";
-    url += QString::number(m_num) + "/api/xml";
-    m_parser->parse(Downloader::instance()->get(QUrl(url)));
+    url += QString::number(m_num) + XML_API_SUFFIX;
+    QNetworkReply *reply = Downloader::instance()->get(QUrl(url));
+
+    m_parser->parse(reply);
+    /* connect after the parser to handle redirections */
+    connect(reply, SIGNAL(finished()), this,
+            SLOT(networkReplyFinished()));
+}
+
+void Project::networkReplyFinished()
+{
+    QNetworkReply *reply = qobject_cast<QNetworkReply *>(sender());
+
+    if (reply == NULL)
+        return;
+
+    int status = reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt();
+    static const QRegExp build_exp("/[0-9]+" XML_API_SUFFIX "$");
+
+    if (status == HTTP_MOVED_PERM)
+    {
+        QString new_uri =
+            reply->attribute(QNetworkRequest::RedirectionTargetAttribute).toString();
+        if (!new_uri.isEmpty() && new_uri.contains(build_exp))
+        {
+            m_uri = new_uri.remove(build_exp);
+            update(m_uri);
+        }
+
+    }
+    else if (status == HTTP_FOUND)
+    {
+        QString new_uri =
+            reply->attribute(QNetworkRequest::RedirectionTargetAttribute).toString();
+        if (!new_uri.isEmpty() && new_uri.contains(build_exp))
+        {
+            update(QUrl(new_uri.remove(build_exp)));
+        }
+    }
 }
 
 bool Project::isUpdating() const

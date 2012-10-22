@@ -65,7 +65,13 @@ public:
         return m_trayNotif;
     }
 
+    inline void setUrl(const QString &uri)
+    {
+        m_url = uri;
+    }
+
     bool configure();
+    void save();
 
 protected:
     int m_interval;

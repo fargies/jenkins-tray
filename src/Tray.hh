@@ -57,7 +57,7 @@ public:
 protected:
     void setState(Project::State);
 
-    void update();
+    void update(const QString &uri);
 
 protected slots:
     void updateEvent(const QString &name, const QUrl &uri, int buildNum);

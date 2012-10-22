@@ -37,6 +37,9 @@
 
 namespace jenkins {
 
+#define RSS_LATEST_SUFFIX "/rssLatest"
+#define RSS_LATEST_SUFFIX_LEN (sizeof (RSS_LATEST_SUFFIX) - 1)
+
 Tray::Tray() :
     QSystemTrayIcon(QIcon(":/icons/gear")),
     m_globalState(Project::UNKNOWN),
@@ -165,17 +168,16 @@ void Tray::activate(QSystemTrayIcon::ActivationReason reason)
 
 void Tray::timerEvent()
 {
-    update();
+    update(m_settings->getUrl());
     m_first = false;
 }
 
-void Tray::update()
+void Tray::update(const QString &uri)
 {
     Downloader *down = Downloader::instance();
 
     down->enableAuth(!m_settings->getUser().isEmpty());
-    QNetworkReply *reply = down->get(QUrl(m_settings->getUrl() +
-                "/rssLatest"));
+    QNetworkReply *reply = down->get(QUrl(uri + RSS_LATEST_SUFFIX));
     connect(reply, SIGNAL(error(QNetworkReply::NetworkError)),
             this, SLOT(networkError(QNetworkReply::NetworkError)));
     connect(reply, SIGNAL(finished()),
@@ -205,11 +207,48 @@ void Tray::setState(Project::State state)
 
 void Tray::updateFinished()
 {
-    emit finished();
-    if (!m_timer.isActive())
+    QNetworkReply *reply = qobject_cast<QNetworkReply *>(sender());
+    bool is_finished = true;
+
+    if (reply != NULL)
     {
-        m_timer.setInterval(m_settings->getInterval() * 1000);
-        m_timer.start();
+        int status = reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt();
+
+        if (status == HTTP_MOVED_PERM)
+        {
+            QString new_uri =
+                reply->attribute(QNetworkRequest::RedirectionTargetAttribute).toString();
+            if (!new_uri.isEmpty() && new_uri.endsWith(RSS_LATEST_SUFFIX))
+            {
+                new_uri.truncate(new_uri.size() - RSS_LATEST_SUFFIX_LEN);
+                m_settings->setUrl(new_uri);
+                m_settings->save();
+                update(m_settings->getUrl());
+                is_finished = false;
+            }
+        }
+        else if (status == HTTP_FOUND)
+        {
+            QString new_uri =
+                reply->attribute(QNetworkRequest::RedirectionTargetAttribute).toString();
+            if (!new_uri.isEmpty() && new_uri.endsWith(RSS_LATEST_SUFFIX))
+            {
+                new_uri.truncate(new_uri.size() - RSS_LATEST_SUFFIX_LEN);
+                update(new_uri);
+                is_finished = false;
+            }
+        }
+        reply->deleteLater();
+    }
+
+    if (is_finished)
+    {
+        emit finished();
+        if (!m_timer.isActive())
+        {
+            m_timer.setInterval(m_settings->getInterval() * 1000);
+            m_timer.start();
+        }
     }
 }
 

@@ -71,16 +71,21 @@ bool Settings::configure()
         m_user = m_conf.user->text();
         m_token = m_conf.auth_token->text();
 
-        QSettings settings("Jenkins", "JenkinsTray");
-        settings.setValue("interval", m_interval);
-        settings.setValue("url", m_url);
-        settings.setValue("tray_notifications", m_trayNotif);
-        settings.setValue("user", m_user);
-        settings.setValue("token", m_token);
-        settings.sync();
+        save();
         return true;
     }
     return false;
+}
+
+void Settings::save()
+{
+    QSettings settings("Jenkins", "JenkinsTray");
+    settings.setValue("interval", m_interval);
+    settings.setValue("url", m_url);
+    settings.setValue("tray_notifications", m_trayNotif);
+    settings.setValue("user", m_user);
+    settings.setValue("token", m_token);
+    settings.sync();
 }
 
 }

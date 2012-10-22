@@ -33,6 +33,9 @@
 
 namespace jenkins {
 
+#define HTTP_MOVED_PERM 301
+#define HTTP_FOUND 302
+
 class Downloader : public QNetworkAccessManager
 {
     Q_OBJECT;

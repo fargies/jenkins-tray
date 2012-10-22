@@ -13,7 +13,7 @@ check_function_exists(getopt_long HAVE_GETOPT_LONG)
 option(TESTS "Compile and run unit tests" OFF)
 if (TESTS)
     include(FindPkgConfig)
-    pkg_check_modules(CPPUNIT cppunit)
+    pkg_check_modules(CPPUNIT REQUIRED cppunit)
 endif (TESTS)
 
 

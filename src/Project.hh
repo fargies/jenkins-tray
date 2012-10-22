@@ -74,7 +74,10 @@ public:
 
     bool isUpdating() const;
 
-    void update();
+    void update(const QUrl &url);
+
+    inline void update()
+    { update(m_uri); }
 
 signals:
     void updated(const Project &);
@@ -84,6 +87,7 @@ public slots:
 
 protected slots:
     void stateEvent(Project::State state);
+    void networkReplyFinished();
 
 protected:
     BuildParser *m_parser;
