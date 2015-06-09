@@ -37,7 +37,7 @@ namespace jenkins {
 class Settings
 {
 public:
-    Settings();
+    Settings(QString &instance);
     virtual ~Settings();
 
     inline int getInterval() const
@@ -74,6 +74,7 @@ public:
     void save();
 
 protected:
+    QString m_instance;
     int m_interval;
     QString m_url;
     QString m_user;

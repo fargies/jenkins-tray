@@ -28,3 +28,12 @@ CTEST_OUTPUT_ON_FAILURE=1 make test
 ./tests/test_all
 --------------------------------------
 
+== Run ==
+
+jenkinsTray
+
+or to run multiple instance
+
+jenkinsTray <context>
+
+where context is string use to create different configuration file
