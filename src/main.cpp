@@ -27,15 +27,25 @@
 #include <QApplication>
 #include <QMessageBox>
 #include "Tray.hh"
+#include "Settings.hh"
 
 int main(int argc, char *argv[])
 {
+
+QString instance;
+
+if (argc > 0) {
+instance = QString(argv[1]);
+} else {
+instance = QString("");
+}
+
     QApplication app(argc, argv);
     app.setQuitOnLastWindowClosed(false);
 
     Q_INIT_RESOURCE(Tray);
 
-    jenkins::Tray tray;
+    jenkins::Tray tray(instance);
     tray.start();
     return app.exec();
 }

@@ -40,12 +40,12 @@ namespace jenkins {
 #define RSS_LATEST_SUFFIX "/rssLatest"
 #define RSS_LATEST_SUFFIX_LEN (sizeof (RSS_LATEST_SUFFIX) - 1)
 
-Tray::Tray() :
+Tray::Tray(QString &instance) :
     QSystemTrayIcon(QIcon(":/icons/gear")),
     m_globalState(Project::UNKNOWN),
     m_parser(new RSSParser()),
     m_menu(new Menu(NULL)),
-    m_settings(new Settings()),
+    m_settings(new Settings(instance)),
     m_timer(), m_first(true)
 {
     connect(&m_timer, SIGNAL(timeout()),

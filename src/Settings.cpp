@@ -31,9 +31,10 @@
 
 namespace jenkins {
 
-Settings::Settings()
+Settings::Settings(QString &instance)
 {
-    QSettings settings("Jenkins", "JenkinsTray");
+    m_instance = instance;
+    QSettings settings("Jenkins", QString("JenkinsTray") + m_instance);
 
     m_interval = settings.value("interval", DEFAULT_INTERVAL).toInt();
     m_url = settings.value("url", DEFAULT_URI).toString();
@@ -79,7 +80,7 @@ bool Settings::configure()
 
 void Settings::save()
 {
-    QSettings settings("Jenkins", "JenkinsTray");
+    QSettings settings("Jenkins", QString("JenkinsTray") + m_instance);
     settings.setValue("interval", m_interval);
     settings.setValue("url", m_url);
     settings.setValue("tray_notifications", m_trayNotif);

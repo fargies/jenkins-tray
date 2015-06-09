@@ -47,7 +47,7 @@ class Tray : public QSystemTrayIcon
     Q_OBJECT
 
 public:
-    Tray();
+    Tray(QString &instance);
     virtual ~Tray();
 
     void start();
